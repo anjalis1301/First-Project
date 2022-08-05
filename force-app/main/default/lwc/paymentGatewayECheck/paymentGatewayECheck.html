@@ -1,0 +1,42 @@
+<template>
+    <div>
+        <lightning-layout>
+            <lightning-layout-item size="12" small-device-size="6" medium-device-size="4" large-device-size="3" padding="around-small">
+                <div class="outerDiv">
+                    <img class = "logo" src={logo} alt="Logo"/>
+                    <div class="innerDiv1">
+                        <p>E-Check Details</p><br/>
+                        <div class="innerDiv2">
+                            <lightning-spinner class="slds-hide" data-id="spin" alternative-text="Loading" size="large"></lightning-spinner>
+                            <div class="msg"> {Msg}</div>
+                            <table>
+                                <tr>
+                                    <td>
+                                        <lightning-input onchange={storeRoutingNumber} label="Routing Number" name="RoutingNumber" value={RoutingNumber} placeholder="9 digit number" required="true" autocomplete="off"></lightning-input>
+                                    </td>
+                                    <td>
+                                        <lightning-input onchange={storeAccNumber} label="Account Number" name="AccNum" placeholder="3-17 digit(Eg..45223..)" value={AccNum} required="true" autocomplete="off"></lightning-input>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <lightning-input onchange={storeAccName} label="Name of Account" name="AccName" placeholder="Eg.. Sam Will" required="true" value={AccName} autocomplete="off"></lightning-input>
+                                    </td>
+                                    <td>
+                                        <lightning-input onchange={storeAmount} label="Amount(less than 100K)" name="Amount" placeholder="Eg..2500" value={Amnt} required="true" autocomplete="off"></lightning-input>
+                                    </td>
+                                </tr>
+                            </table>
+                            <div class="buttonsDiv">
+                                <lightning-button class="Pay" variant="brand" label="Pay" title="Success" onclick={payByECheck}></lightning-button>
+                                &nbsp;&nbsp;&nbsp;
+                                <lightning-button label="Pay By Card" variant="brand" onclick={visible}></lightning-button>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+            </lightning-layout-item>
+        </lightning-layout>
+    </div>
+</template>

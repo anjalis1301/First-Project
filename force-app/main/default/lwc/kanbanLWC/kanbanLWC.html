@@ -1,0 +1,71 @@
+<template>
+	<div class="slds-page-header slds-m-bottom--small" role="banner">
+		<div class="slds-media slds-media--center">
+			<div class="slds-media__figure">
+				<span class="slds-icon_container" title="Description of icon when needed">
+					<lightning-icon icon-name="utility:kanban" variant="brand" size="medium"></lightning-icon>
+				</span>
+			</div>
+			<div class="slds-media__body">
+				<p class="slds-page-header__title slds-truncate slds-text-heading--large">
+					<strong>&nbsp;Kanban View </strong>
+				</p>
+			</div>
+		</div>
+	</div>
+	<div class="stageContainer" style="width:100%;overflow:auto;background-color:white;">
+		<div class="slds-grid">
+			<div class="slds-tabs--path" role="application">
+				<ul class="slds-tabs--path__nav" role="tablist" style="padding-left:12px">
+					<template for:each={recordList} for:item="rec">
+						<li key={rec.Id} class="slds-tabs--path__item slds-is-active"
+							style="min-width:265px ;max-width:265px ;">
+							<a class="slds-tabs--path__link" tabindex="-1" role="tab">
+								<span class="slds-tabs--path__title slds-text-heading--medium slds-truncate">{rec.key}
+									&nbsp;</span>
+								<span class="slds-text-heading--medium">({rec.value.length})</span>
+							</a>
+						</li>
+					</template>
+				</ul>
+			</div>
+		</div>
+		<div>
+			<div class="slds-border_bottom slds-p-around_x-small">
+				<ul class="slds-list_horizontal ">
+					<template for:each={recordList} for:item="rec" for:index="headerIndex">
+						<li class="slds-item slds-m-around_small"
+							style="min-width:265px ;max-width:265px ;margin:-0.005rem;" data-index={headerIndex}
+							key={rec.key}>
+							<ul class="slds-has-dividers_around-space dropZone" ondrop={dropData} ondragover={allowDrop}
+								data-index={headerIndex} data-id={rec.key} data-pick-val={rec.key}
+								style="height:64vh;overflow-y:auto">
+								<template for:each={rec.value} for:item="val" for:index="valueIndex">
+									<li key={val.Id} class="slds-item slds-m-around_small" draggable="true"
+										ondragstart={dragStart} data-id={val.Id} data-index={valueIndex}>
+										<article class="slds-tile slds-tile_board">
+											<div class="slds-tile__detail slds-text-body_small">
+												<!-- <template for:each={fldList} for:item="fld" for:index="idx">
+													<c-print-values key={fld} obj-name={objNm} record={val} field={fld}
+														index={idx}></c-print-values>
+												</template> -->
+												<lightning-record-view-form record-id={val.Id}
+                                                        object-api-name={objNm}
+                                                        density="compact">
+                                                        <template for:each={fldList} for:item="fld" for:index="idx">
+                                                            <lightning-output-field field-name={fld} key={fld}>
+                                                            </lightning-output-field>
+                                                        </template>
+                                                </lightning-record-view-form>
+											</div>
+										</article>
+									</li>
+								</template>
+							</ul><br /><br /><br /><br /><br />
+						</li>
+					</template>
+				</ul>
+			</div>
+		</div>
+	</div>
+</template>

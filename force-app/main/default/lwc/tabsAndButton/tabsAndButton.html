@@ -1,0 +1,43 @@
+<template>
+
+    <template if:true={showTab}>
+    <div class="slds-m-top_medium slds-m-bottom_x-large">
+        <c-kanban-l-w-c obj-nm="Account" pick-list-field-name="Type" flds="Id,Name,Type" ></c-kanban-l-w-c> 
+        {info}hello
+        <!-- Simple -->
+        <div class="slds-p-around_medium lgc-bg" style="float:right">
+            <lightning-button-menu alternative-text="Show menu">
+                <lightning-menu-item value="MenuItemOne" label="One"></lightning-menu-item>
+                <lightning-menu-item value="MenuItemTwo" label="Two"></lightning-menu-item>
+                <lightning-menu-item value="MenuItemThree" label="Three"></lightning-menu-item>
+                <lightning-menu-item value="MenuItemFour" label="Filter" onclick={navigate}></lightning-menu-item>
+            </lightning-button-menu>
+        </div>
+    </div>
+
+    
+    <div class="slds-tabs_default" style="background-color: aliceblue;">
+        <ul class="slds-tabs_default__nav" role="tablist">
+            <li class="slds-tabs_default__item " title="Item One" data-id="One" onclick={changeTab} role="presentation">
+                <a class="slds-tabs_default__link"  role="tab"  aria-selected="true" aria-controls="tab-default-1" id="tab-default-1__item">Item One</a>
+            </li>
+            <li class="slds-tabs_default__item slds-is-active" data-id="Two" onclick={changeTab} title="Item Two" role="presentation">
+                <a class="slds-tabs_default__link"  role="tab"  aria-selected="false" aria-controls="tab-default-2" id="tab-default-2__item">Item Two</a>
+            </li>
+            <li class="slds-tabs_default__item " title="Item Three" data-id="Three" onclick={changeTab} role="presentation">
+                <a class="slds-tabs_default__link"  role="tab"  aria-selected="false" aria-controls="tab-default-3" id="tab-default-3__item">Item Three</a>
+            </li>   
+        </ul>
+        <div id="tab-default-1" data-id="OneContent" class="slds-tabs_default__content slds-hide" role="tabpanel" aria-labelledby="tab-default-1__item">Item One Content</div>
+        <div id="tab-default-2" data-id="TwoContent" class="slds-tabs_default__content slds-show" role="tabpanel" aria-labelledby="tab-default-2__item">Item Two Content</div>
+        <div id="tab-default-3" data-id="ThreeContent" class="slds-tabs_default__content slds-hide" role="tabpanel" aria-labelledby="tab-default-3__item">Item Three Content</div>
+        </div> 
+    </template>
+    <template if:false={showTab}>
+        <div style="background-color: aliceblue;">
+            <lightning-button-icon icon-name="utility:back"  alternative-text="back" title="Previous" onclick={navigateBack}></lightning-button-icon>
+            <p>Helooooooooooooooooo{infoTabb}</p>
+        </div>
+        <p>filter Data</p>
+    </template> 
+</template>

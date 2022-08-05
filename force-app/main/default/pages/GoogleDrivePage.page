@@ -1,0 +1,126 @@
+<apex:page controller="GoogleDriveController" action="{!driveAuth}" sidebar="false" showHeader="false">
+    
+    <script type='text/javascript'>
+    function callUpload() {
+        var file= document.getElementsByClassName('input');
+        var fileSize = file[0].files[0].size;
+        if(fileSize > 4350000){
+        	alert('File size should be less than 4.36Mb');
+            file[0].style.visibility = "hidden";
+        }
+        else {
+        	initiateUpload();
+        } 
+    }
+    function input(){
+        var name = window.prompt("Folder Name");
+        if(!name.trim()){
+            name = 'New Folder';
+        }
+        callCreate(name); 
+    }
+    </script>
+    
+    <style>
+        .backgroundSpin{
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        background-color: #000;
+        opacity: 0.2;
+        z-index: 999999;
+        }
+        .spin{
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        background-image: url("/img/loading32.gif");
+        background-size: 30px;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+        background-position: center;
+        z-index: 9999999;
+        opacity: 1;
+        }
+        .headerRow .headings {
+        font-size:17px !important; 
+        text-align:center !important;
+        }
+
+        .linkName{
+        text-decoration:none;
+        font-size: 25px !important;
+        }
+        .tableData{
+        text-decoration:none;
+        font-size: 20px !important;
+        }
+        .NoData{
+        font-size: 120px !important;
+        }
+        .textData {
+        	font-size : 20px !important;
+        }
+    </style>
+    
+    <div class="driveDetails" >   
+        
+        <apex:form id="driveInfoForm">  
+            <apex:actionStatus id="spin">
+                <apex:facet name="start">
+                    <div class="backgroundSpin" />
+                    <div class="spin" />
+                </apex:facet>
+            </apex:actionStatus><br/><br/>
+            <b><center><apex:image url="{! URLFOR($Resource.Icons,'icons/google_drive_logo.png')}" width="380" height="75" /></center></b><br/>  
+           <apex:pageMessages id="info"/>
+            <apex:pageBlock id="data"  >
+                <p id="try"></p>
+                <div >
+                    <apex:repeat value="{!driveNav}" var="nav">
+                        <apex:commandLink action="{!fileDetails}" value="{!nav.title}" styleClass="linkName" reRender="driveInfoForm" status="spin">&nbsp;<apex:image url="{!URLFOR($Resource.Icons,'icons/arrow.png')}" width="10" height="13" /> &nbsp;&nbsp; 
+                            <apex:param assignTo="{!selectId}" value="{!nav.id}" name="select" />
+                        </apex:commandLink>
+                    </apex:repeat>
+                </div>
+                <apex:commandButton action="{!displayUpload}" value="Upload File"  style="float:right; margin-top:-25px;height:35px;width:75px;"/>
+                 <apex:actionFunction action="{!createFolder}" name="callCreate" reRender="driveInfoForm" status="spin">
+                	<apex:param assignTo="{!newFolderName}" name="create" value="" />
+            	</apex:actionFunction>
+                <apex:commandButton onclick="input()" value="Create Folder" style="float:right; margin-top:-25px; height:35px;width:75px;" reRender="driveInfoForm" status="spin" />
+                <br/>
+                <apex:pageBlockSection rendered="{!if(driveDataSize > 0,'false','true')}">
+                    <apex:outputText styleClass="NoData">No Data To Display</apex:outputText>
+                </apex:pageBlockSection>
+                <div >
+                    <apex:pageBlockSection rendered="{!uploadShow}">
+                        <apex:actionFunction action="{!upload}" name="initiateUpload" />
+                        <apex:inputFile value="{!file}" contentType="{!fileType}" fileName="{!uFileName}" fileSize="{!uFileSize}" id="inputData" onchange="callUpload()" styleclass="input" />
+                    </apex:pageBlockSection>
+                </div>
+                <div style="overflow-y: scroll; height: 500px;">
+                    <apex:pageBlockTable value="{!driveData}" var="allF" rendered="{!if(driveDataSize > 0,'true','false')}" >
+                        <apex:column headerValue="Name" headerClass="headings">
+                            <apex:commandLink action="{!fileDetails}"  rendered="{!if(allF.type =='Folder','true','false')}" styleClass="tableData">
+                                <apex:image url="{!URLFOR($Resource.Icons,'icons/folder.png')}" width="20" height="20" rendered="{!if(allF.type =='Folder','true','false')}"/>&nbsp;&nbsp;&nbsp;{!allF.title}
+                                <apex:param assignTo="{!selectId}" value="{!allF.id}" name="select" />
+                            </apex:commandLink>
+                                <apex:image url="{!if(allF.type=='File',$Resource.gDriveFile,URLFOR($Resource.Icons,'icons/file.png'))}" width="20" height="20" rendered="{!if(allF.type !='Folder','true','false')}"/>&nbsp;&nbsp;&nbsp;
+                                <apex:outputText rendered="{!if(allF.type !='Folder','true','false')}" value="{!allF.title}" styleClass="textData" />
+                        </apex:column>
+                        
+                        <apex:column headerValue="Actions" headerClass="headings" >
+                            <apex:commandLink action="{!deleteData}" styleClass="linkName" reRender="driveInfoForm" status="spin" >
+                                <apex:image url="{!URLFOR($Resource.Icons,'icons/delete.png')}" width="20" height="20" style="padding-left:690px;"/>
+                                <apex:param assignTo="{!delSelectId}" value="{!allF.id}" name="sel" />
+                            </apex:commandLink>&nbsp;&nbsp;&nbsp;&nbsp;
+                            <apex:commandLink action="{!downloadFile}" styleClass="linkName" status="spin" ><apex:image url="{!$Resource.driveImageDownload}" width="20" height="20" rendered="{!if(allF.type !='Folder'&&allF.type !='Drive File' ,'true','false')}"/>
+                                <apex:param assignTo="{!selectId}" value="{!allF.id}" name="sel" />
+                            </apex:commandLink>
+                        </apex:column>
+                    </apex:pageBlockTable>
+                </div>
+            </apex:pageBlock>
+        </apex:form>  
+    </div> 
+</apex:page>

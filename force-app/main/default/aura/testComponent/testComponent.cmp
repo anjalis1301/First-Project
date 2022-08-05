@@ -1,0 +1,17 @@
+<aura:component controller="TestContact" implements="flexipage:availableForAllPageTypes">
+    <aura:attribute name="message" type="String" default="Hello!!!" />
+    <aura:attribute name="Con" type="Contact" default="{'sobject':'Contact',
+                                                                 'LastName':''}"/>
+    <aura:attribute name="insertedCon" type="Contact[]" />
+    <aura:handler event="c:sampleEvent" action="{!c.handleChange}" />
+    <h2>{!v.message}</h2>
+    <lightning:button onclick="{!c.handleClick}" label="Click me" />
+    <form class="slds-form_stacked">
+        <lightning:input aura:id="conRec" label="First Name" name="contactFName" value="{!v.Con.FirstName}" />
+        <lightning:input aura:id="conRec" label="Last Name" name="contactLName" value="{!v.Con.LastName}" required="true"/>
+        <lightning:button label ="Create Contact" onclick="{!c.createCon}" />
+    </form>
+    <lightning:layout>
+        
+    </lightning:layout>
+</aura:component>

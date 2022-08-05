@@ -1,0 +1,21 @@
+<template>  
+  <lightning-card> 
+    <lightning-combobox
+            name="shMethod"
+            label="Shipping Methods"
+            value={selectedShippingMethod}
+            placeholder="Select method"
+            options={shippingOptions}
+            onchange={handleShippingMethod} ></lightning-combobox>
+
+    <p>Selected value is: {selectedShippingMethod}</p>
+    </lightning-card>
+    <lightning-card>  
+      <c-record-list currentpage={page} onrecordsload={handleRecordsLoad} pagesize={pagesize}></c-record-list>  
+      <div class="slds-m-around_medium">  
+        <c-pagination-bottom onprevious={handlePrevious} onnext={handleNext} onfirst={handleFirst}  
+          onlast={handleLast} currentpage={page} totalrecords={totalrecords} pagesize={pagesize}>  
+        </c-pagination-bottom>  
+      </div>  
+    </lightning-card>  
+  </template>

@@ -1,0 +1,46 @@
+<template>
+    <div>
+        <lightning-layout>
+            <lightning-layout-item size="12" small-device-size="6" medium-device-size="4" large-device-size="3" padding="around-small">
+                <div class="outerDiv" >
+                    <img class = "logo" src={logo} alt="Logo"/>
+                    <div class="innerDiv1" >
+                        <p>Card Details</p>
+                        <div class="innerDiv2" >
+                            <lightning-spinner class="slds-hide" data-id="spin" alternative-text="Loading" size="large"></lightning-spinner>
+                            <div class="inputFiedDiv">
+                                <br/><br/><div class="msg"> {Msg}</div><br/>
+                                <table >
+                                    <tr>
+                                        <td>
+                                            <lightning-input class="InputLong" onchange={handleCardNum} value={CardNum} label="Card Number" name="CardNumber" placeholder="3-17 digit(Eg..45223..)" required="true" autocomplete="off"></lightning-input>
+                                        </td>
+                                        <td>
+                                            <lightning-input class="AmountInput" onchange={handleAmnt} value={Amnt} label="Amount(less than 100k)" name="Amount" placeholder="Eg...65000" required="true" autocomplete="off"></lightning-input>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td>
+                                            <lightning-input class="inputM" onchange={handleExpireMon} value={ExpireMon} label="Expire Month" name="ExpireMonth" placeholder="(mm)Eg...06" required="true" autocomplete="off"></lightning-input>
+                                        </td>
+                                        <td>
+                                            <lightning-input class="inputY" onchange={handleExpireYear} value={ExpireYear} label="Expire Year" name="ExpireYear" placeholder="(yyyy)Eg...2024" required="true" autocomplete="off"></lightning-input>
+                                        </td>
+                                        <td>
+                                            <lightning-input class="inputC" onchange={handleCVV} label="CVV Number" value={CVV} name="CVVNumber" placeholder="(3-4 digit)Eg...652 OR 6524" required="true" autocomplete="off"></lightning-input>
+                                        </td>
+                                    </tr>
+                                    <tr></tr>
+                                </table>
+                            <lightning-button class="PayButton" variant="brand" label="Pay" title="Success" onclick={payByCard}></lightning-button>
+                            &nbsp;&nbsp;&nbsp;
+                            <lightning-button label="Pay By E-check" variant="brand" onclick={visible}></lightning-button>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+            </lightning-layout-item>
+        </lightning-layout>
+    </div>
+    </template>

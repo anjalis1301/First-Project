@@ -1,0 +1,40 @@
+<aura:component controller="CommunityHomeTab" implements="forceCommunity:availableForAllPageTypes">
+    <aura:attribute name="userData" type="Object" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <br/><br/>
+    <div >
+       
+                <div class="slds-media__body">
+                    <p class="slds-page-header__title slds-truncate slds-text-heading--large"  style="margin-left:788px" >
+                        <span class="slds-avatar slds-avatar_square" style="height:153px; width:256px">
+                            <img src="{!v.userData.FullPhotoUrl}" alt="image" height="183" width="256"/>
+                          </span>
+                        <!--img src="{!v.userData.FullPhotoUrl}" alt="image" height="95px;"/--><br/>
+                        <strong>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;{!v.userData.Name}</strong>
+                    </p>
+                </div> <br/><br/>
+              
+        <div style="padding:10px;margin-left:478px">  
+            <div class="slds-grid slds-wrap" style="font-size:15px;">
+                <div class="slds-col slds-size_5-of-12" >
+                    <h1 style="display:inline;">Name :</h1>&nbsp;&nbsp;<p style="display:inline;">{!v.userData.Name}</p>
+                </div><div class="slds-col slds-size_5-of-12">
+                <h1 style="display:inline;">Email :</h1>&nbsp;&nbsp;<p style="display:inline;">{!v.userData.Email}</p>
+                </div><hr /><br/>        
+                <div class="slds-col slds-size_5-of-12" >
+                    <h1 style="display:inline;"> UserName :</h1>&nbsp;&nbsp;<p style="display:inline;">{!v.userData.Username}</p>
+                </div>
+                <div class="slds-col slds-size_5-of-12">            
+                    <h1 style="display:inline;">Mobile :</h1>&nbsp;&nbsp;<p style="display:inline;">{!v.userData.MobilePhone}</p>            
+                </div><hr /><br/>
+                <div class="slds-col slds-size_5-of-12">            
+                    <h1 style="display:inline;">Company Name :</h1>&nbsp;&nbsp;<p style="display:inline;">{!v.userData.CompanyName}</p>            
+                </div>
+                <div class="slds-col slds-size_5-of-12">            
+                    <h1 style="display:inline;">Phone :</h1>&nbsp;&nbsp;<p style="display:inline;">{!v.userData.Phone}</p>            
+                </div>
+            </div>
+            <lightning:spinner class="slds-hide" aura:id="Spinner" alternativeText="Loading" size="medium" variant="brand"/>
+        </div>
+    </div>
+</aura:component>

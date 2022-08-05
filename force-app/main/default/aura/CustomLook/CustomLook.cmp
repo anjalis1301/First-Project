@@ -1,0 +1,53 @@
+<aura:component controller="LookUpController">
+    <aura:attribute name="userInputs" type="Object" />
+    <aura:attribute name="searchTerm" type="String" default="" />
+    <aura:attribute name="resultantRecords" type="List" />
+    <aura:attribute name="selectedRecordId" type="String" default="" />
+    <aura:attribute name="selectedPill" type="Object" default=""/>
+    <aura:attribute name="error" type="boolean" default="false"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <aura:method name="callSelectItem" action="{!c.selectItem}" access="public"/>
+                <div class="slds-combobox slds-dropdown-trigger slds-dropdown-trigger_click" aura:id="resultsDiv" aria-expanded="true" aria-haspopup="listbox" role="combobox">
+                    <div class="slds-combobox__form-element slds-input-has-icon slds-input-has-icon_right" role="none">
+                        <div aura:id="lookup-pill" >
+                            <!-- Selected Value Pill -->
+                            <label class="slds-form-element__label">{!v.userInputs.label}</label>
+                            <lightning:pill class="fullWidth" label="{!v.selectedPill}" onremove="{! c.removeItem }" >
+                                <aura:set attribute="media">
+                                    <lightning:icon iconName="{!v.userInputs.iconName}" size="x-small" alternativeText="icon" />
+                                </aura:set>
+                            </lightning:pill>
+                        
+                        </div>
+                        <div aura:id="lookupField" >
+                            <!-- Icon, Search Bar, Search Icon -->
+                            <lightning:icon class="slds-combobox__input-entity-icon" iconName="{!v.userInputs.iconName}" size="large" alternativeText="icon" style="margin-top:12px" />
+                            <lightning:input aura:id="inputLookup" class="inputBox" label="{!v.userInputs.label}" placeholder="{!v.userInputs.placeholder}" onfocusout="{!c.hideList}" onclick="{!c.showRecords}" onchange="{!c.searchRecords}" value="{!v.searchTerm}" autoComplete="off" id="combobox-id-1" />
+                            <lightning:icon class="slds-input__icon" iconName="utility:search" size="x-small" alternativeText="search" style="margin-top:4px"/>
+                        </div>
+                    </div>
+                    <!-- Dropdown List -->
+                    <div id="listbox-id-1" class="slds-dropdown slds-dropdown_length-with-icon-5" style = "{! 'max-height:' + (8 + (v.userInputs.recordToDisplay * 40)) + 'px' +';width: -webkit-fill-available;position:relative;'}" >
+                        <ul class="slds-listbox slds-listbox_vertical recordListBox" role="presentation">
+                            <aura:iteration items="{!v.resultantRecords}" var="rec" >
+                                <li name="{!rec}" class="slds-listbox__item eachItem" onclick="{!c.selectItem}">
+                                    <div class="slds-media slds-listbox__option_entity" >
+                                        <lightning:icon iconName="{!v.userInputs.iconName}" size="medium"  alternativeText="icon" />
+                                        <span class="slds-truncate" style="padding-left:10px;">{!rec.Name}</span>
+                                    </div>
+                                </li>
+                            </aura:iteration>
+                            <lightning:spinner class="slds-hide" aura:id="Spinner" alternativeText="Loading" size="small" variant="brand"/>
+                            
+                            <!-- To display Error Message -->
+                            <aura:if isTrue = "{!v.error}">
+                                <li class = "slds-listbox__item" >
+                                    <span class = "slds-media slds-listbox__option_entity">No Records To display</span>
+                                </li>
+                            </aura:if>
+                        </ul>
+                    </div>
+                </div>
+            
+    
+</aura:component>

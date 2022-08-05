@@ -1,0 +1,97 @@
+<aura:component controller = "DropBoxIntegration" implements="forceCommunity:availableForAllPageTypes">
+    <aura:attribute name="dataList" type="List" />
+    <aura:attribute name="currentFolder" type="String" default=""/>
+    <aura:attribute name="breadCrumb" type = "List" />
+    <aura:attribute name="isOpen" type="Boolean" default="false" />
+    <aura:attribute name="newFolderName" type="String" />
+
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <center><img src="{! $Resource.CommunityDropboxLogo}" width="420" /></center><br/>
+    <div style="margin-left:426px; margin-right:426px">
+        <div class="slds-grid">
+            <div class="slds-tabs--path" role="application" >
+                <ul class="slds-tabs--path__nav" role="tablist" style="padding-left:12px">
+                    <aura:iteration items="{!v.breadCrumb}" var="crumb" indexVar = "idx">
+                        <li class="slds-tabs--path__item slds-is-active" style="min-width:105px !important;max-width:105px !important;">
+                            <a class="slds-tabs--path__link" tabindex="-1" role="tab" data-index="{!idx}" onclick="{!c.breadCrumbClicked}">
+                                <span class="slds-tabs--path__title slds-text-heading--medium slds-truncate">{!crumb.name}&nbsp;</span>
+                            </a>
+                        </li>               
+                    </aura:iteration>
+                </ul>
+            </div>
+        </div><br/>
+        <center><table border="0px" cellspacing="12px">
+            <tr style="border-bottom: 1pt solid">
+                <th style="font-size:25px !important;">File/Folders</th>
+                <th style="margin-left:25px !important;"></th>
+            </tr>
+            <tr style="border-bottom: 1pt solid #C0C0C0 !important"></tr>
+            <aura:if isTrue="{!equals(v.dataList.length,0)}">
+                <tr><td><center><p style="font-size:20px;">Sorry !!<br/>No Records To Display........</p></center></td></tr>
+            </aura:if>
+            <aura:iteration items="{!v.dataList}" var="data" indexVar = "idx">
+                <tr style="border-bottom: 1pt solid">  
+                    <td style="font-size:15px !important;">           
+                        <div style="display:inline">
+                            <aura:if isTrue = "{!equals(data.dType,'folder')}">
+                                <img src="{! $Resource.Icons+ '/icons/folder.png'}"  width="35" height="30" />
+                                <aura:set attribute="else">                            	
+                                    <img src="{! $Resource.Icons+ '/icons/file.png'}"  width="30" height="30"/>
+                                </aura:set>
+                            </aura:if>
+                            &nbsp;&nbsp;&nbsp;&nbsp;<a onclick="{!c.openFileOrFolder}" data-fileData="{!data}" data-index="{!idx}" >{!data.name}</a>
+                        </div>
+                    </td>
+                    <td>
+                        <a onclick="{!c.deleteClicked}" data-index="{!idx}">
+                                    <img src="{! $Resource.Icons+ '/icons/delete.png'}"  width="25" height="25"/> </a>&nbsp;&nbsp;&nbsp;&nbsp;
+                        <aura:if isTrue = "{!equals(data.dType,'file')}">
+                            <a onclick="{!c.downloadClicked}" data-index="{!idx}">
+                                    <img src="{! $Resource.driveImageDownload }"  width="25" height="25"/> </a>
+                        </aura:if>                   
+                    </td>
+                </tr>
+            </aura:iteration><br/><br/>
+            
+        </table></center>
+        <lightning:spinner class="slds-hide" aura:id="Spinner" alternativeText="Loading" size="medium" variant="brand"/>
+        <lightning:button onclick="{!c.createClicked}" label="Create" variant="brand" />
+        <aura:if isTrue="{!v.isOpen}">
+            <form class="form-horizontal" method="POST" commandName="announceBean" action="/announce">
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header slds-modal__header_empty">
+                        <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close">
+                            <lightning:icon iconName="utility:close" size="small"
+                            onclick="{! c.closeModel }"
+                            alternativeText="close"
+                            variant="bare-inverse"
+                            />
+                        </button>
+                        </header>
+                    
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Enter Folder Name</h2>
+                        <lightning:input name="folderName" value="{!v.newFolderName}" placeholder="type here..." autocomplete="off"/>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <lightning:button variant="neutral" 
+                                          label="Cancel"
+                                          title="Cancel"
+                                          onclick="{! c.closeModel }"/>
+                                         
+                        <lightning:button variant="brand" 
+                                          label="OK"
+                                          title="Ok"
+                                          onclick="{! c.folderCreate }"/>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </form>  
+        </aura:if>
+
+        <lightning:button onclick="{!c.uploadClicked}" label = "Upload" variant = "brand" />
+    </div>
+</aura:component>

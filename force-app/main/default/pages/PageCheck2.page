@@ -1,0 +1,145 @@
+<apex:page Controller="ControllerPage">
+    <script type="text/javascript">
+    function chkBoxes (form) {
+        
+        var state;
+       
+        for (i=0;i<form.elements.length;i++) {
+            
+            var obj = form.elements[i];
+            
+            
+            
+            if ((obj.type == 'checkbox') && (obj.name!= 'master')) {
+                
+                
+                
+                //this will check the boxes that got value 1
+                
+                if (obj.value==1) {
+                    
+                    state = obj.checked;
+                    
+                    // true or false
+                    
+                    obj.checked=(state==true)?false:true;
+                    
+                    
+                    
+                }
+                
+            }
+            
+        }
+        
+    }
+    </script>
+    <apex:form id="list">
+        <apex:outputPanel layout="Block" style="overflow:auto; height:100px ">
+            <apex:pageBlock id="record_list"  >
+                
+                    <apex:panelGroup >
+                     <div>
+                         <table width="100%" >
+                           <tr> 
+                               <td >
+                        
+                <apex:commandButton action="{!URLFOR($Action.Contact.NewContact)}" value="NewRecord"/>                
+                <apex:commandButton action="{!URLFOR($Action.Contact.NewContact)}" value="Delete Selected"/>      
+                <apex:commandButton action="{!URLFOR($Action.Contact.NewContact)}" value="Download CSV"/>
+                               </td>
+                               <td align="right">
+                <apex:repeat value="{!characters}" var="char">
+                    <apex:commandLink value="{!char}" action="{!refreshList}" reRender="record_list" style="{!if($CurrentPage.parameters.filter=char,'font-weight:bold','')}" >
+                    	<apex:param name="filter" value="{!char}"/>
+                    </apex:commandLink> | 
+                </apex:repeat>
+                               </td>
+                               </tr>
+                        </table>
+                </div>
+                </apex:panelGroup>
+                <apex:panelGroup >
+                <apex:pageBlockTable value="{!contactResult}" var="cnt" >
+                    <apex:column >
+                        <apex:facet name="header">
+                        	<apex:inputCheckbox id="master" onclick="chkBoxes(list)" />
+                        </apex:facet>
+                        <apex:inputCheckbox />
+                    </apex:column>
+                    <apex:column headerValue="Action" >
+                        <apex:outputLink value="{!URLFOR($Action.Contact.Edit,cnt.id)}" >
+                            Edit
+                        </apex:outputLink>|
+                        <apex:outputLink value="{!URLFOR($Action.Contact.Delete,cnt.id)}">Del
+                        </apex:outputLink>
+                    </apex:column>
+                    <apex:column Headervalue="Name" >
+                        <apex:commandLink action="/{!cnt.id }" target="_blank">{!cnt.Name}</apex:commandLink>
+                    </apex:column>
+                    <apex:column value="{! cnt.FirstName }">
+                        <apex:facet name="header">
+                            <apex:commandLink action="{! sortByFirstName }" reRender="record_list">First Name
+                            </apex:commandLink>
+                        </apex:facet>
+                    </apex:column>
+                    <apex:column value="{! cnt.LastName }">
+                        <apex:facet name="header">
+                            <apex:commandLink action="{! sortByLastName }" reRender="record_list" >Last Name
+                            </apex:commandLink>
+                        </apex:facet>
+                    </apex:column>
+                    <apex:column value="{!cnt.MailingCity}"  />
+                    <apex:column value="{!cnt.MailingState}"  />
+                    <apex:column value="{!cnt.MailingPostalCode}"  />  
+                </apex:pageBlockTable>
+                    <apex:outputText >
+                    
+                    </apex:outputText>
+                <!-- Pagination -->
+                <table width="100%">
+                    <tr>
+                        <td align="left">
+                            <!-- Records per page -->                           
+                            <apex:selectList value="{! setCon.PageSize }" size="1">
+                                <apex:selectOption itemValue="5" itemLabel="5"/>
+                                <apex:selectOption itemValue="10" itemLabel="10"/>
+                                <apex:selectOption itemValue="15" itemLabel="15"/>
+                                <apex:selectOption itemValue="20" itemLabel="20"/>
+                                <apex:actionSupport event="onchange" reRender="record_list"/>
+                            </apex:selectList>
+                        </td>
+                        
+                        <td align="center">
+                            <!-- Previous page -->
+                            <!-- active -->
+                            <apex:commandButton action="{! setCon.First }" value=" First" disabled="{! NOT(setCon.HasPrevious) }" reRender="record_list" />
+                            <apex:commandButton action="{! setCon.Previous }" value=" Previous" disabled="{! NOT(setCon.HasPrevious) }" reRender="record_list"/>
+                            <!-- inactive (no earlier pages) -->
+                            
+                            &nbsp;&nbsp;
+                            <!-- Next page -->
+                            <!-- active -->
+                            <apex:commandButton action="{! setCon.Next }" value="Next " disabled="{! NOT(setCon.HasNext) }" reRender="record_list" />                        
+                            <apex:commandButton action="{! setCon.Last }" value="Last" disabled="{! NOT(setCon.HasNext) }" reRender="record_list" />
+                            
+<!-- inactive (no more pages) -->
+                            
+                            
+                        </td>
+                        <td align="right">
+                            <!-- Page X of Y -->
+                            Page:
+                            <apex:inputText value="{! setCon.PageNumber }" size="2" />
+                            <apex:outputText value=" of {! CEILING(setCon.ResultSize / setCon.PageSize) }" />
+                        </td>
+                        
+                    </tr></table>
+                </apex:panelGroup>
+            </apex:pageBlock>
+            <apex:pageBlock rendered="{!if(10<2,'true','false')}">
+            	hello
+            </apex:pageBlock>
+        </apex:outputPanel>
+    </apex:form>
+</apex:page>

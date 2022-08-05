@@ -1,0 +1,58 @@
+<template>
+    <div style="padding-left:380px;padding-right:30px;"> 
+        <img src={logo} width="220" style="margin-left:356px;"/><br/><br/>
+        
+            <ul class="breadcrumb" >
+                <template for:each={breadCrumb} for:item="bread" for:index="indx" >
+                    <a key={data} data-index={indx} title={bread.id} name={bread.name} onclick={breadCrumbUpdate} style="color:whitesmoke;"><li key={bread}>{bread.name}</li></a>
+                </template>
+            </ul><br/><br/>
+            <p style="font-size:30px;">Files and Folders</p>
+            <template if:true={showData}>
+            <table>
+                <template for:each={allFileAndFolder} for:item = "data" for:index="indx">
+                    <tr key={data}>
+                        <td><template if:true={data.folderCheck}>
+                            <img src={folderImg} title={data.name} style="height:35px;width:35px;"/>&nbsp;&nbsp;
+                            </template>
+                            <template if:false={data.folderCheck}>
+                                <img src={fileImg} title={data.name} style="height:35px;width:35px;"/>&nbsp;&nbsp;
+                            </template>
+                            <a key={data.name} data-id ={data.id} data-index={indx} data-type ={data.type} onclick={openFolderOrFile}>{data.name}</a>
+                        </td><td>
+                            <a key={data.name} data-id ={data.id} data-index={indx} data-type ={data.type} onclick={deleteSelected}><img src={del} title={data.name} style="height:35px;width:35px;"/></a>&nbsp;&nbsp;&nbsp;&nbsp;
+                            <template if:false={data.folderCheck}>
+                                <a key={data.name} data-id ={data.id} data-index={indx} data-type ={data.type} onclick={downloadSelectedFile}><img src={download} title={data.name} style="height:35px;width:35px;"/></a>
+                            </template>
+                        </td>
+                    </tr>
+                </template>
+            </table>
+        </template>
+        <template if:false={showData}><br/><br/>
+            <p style="font-size:35px;margin-left:156px">Sorry!!! No Data To Display</p>
+        </template>
+        <lightning-spinner class="slds-hide" data-id="spin" alternative-text="Loading" size="large"></lightning-spinner>
+        <template if:true={showModal}>
+            <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                <div class="slds-modal__container">
+                    <header class="slds-modal__header">
+                        <lightning-button-icon icon-name="utility:close"  onclick={hideModel} alternative-text="close" title="Close" variant="bare-inverse" class="slds-modal__close"></lightning-button-icon>
+                         <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">
+                            Create Folder
+                        </h2>
+                    </header>
+                    <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                        <lightning-input name="inputFolderName" label="Enter Folder Name" onchange={newName} ></lightning-input>
+                    </div>
+                    <footer class="slds-modal__footer">
+                        <lightning-button variant="brand" label="OK" title="OK" onclick={createNewFol}></lightning-button>
+                    </footer>
+                </div>
+            </section>
+            <div class="slds-backdrop slds-backdrop_open"></div>
+        </template><br/><br/>
+        <lightning-button label="Create" onclick={openCreateModal} variant="brand"></lightning-button>&nbsp;&nbsp;&nbsp;&nbsp;
+        <lightning-button label="Upload" onclick={uploadFile} variant="brand"></lightning-button>
+    </div>
+</template>

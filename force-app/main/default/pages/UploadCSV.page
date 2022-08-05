@@ -1,0 +1,24 @@
+<apex:page controller="UploadCSVRecord">
+    <apex:form >
+    	<apex:pageBlock >
+            <apex:pageMessages />
+            <p><b>Upload a csv Of Contact records</b></p><br/><br/>
+            <apex:inputFile value="{!csvBody}" fileName="{!csvName}" accept=".csv" />
+            <apex:commandButton value="Upload CSV" action="{!uploadCSVFile}"  />
+        </apex:pageBlock>
+        <apex:pageBlock rendered="{! wrapData.summaryDisplay}" id="dataDisplay">
+            <center><p><b>Details of the inserted records</b></p></center><br/><br/>
+           <apex:pageBlockSection collapsible="false" columns="2"  >
+                <p><b>Total Records in CSV File:&nbsp;</b></p>
+                <apex:outputText value="{! wrapData.total}" style="color:black" />
+                <p><b>Number of Records Successfully inserted:&nbsp;</b></p>
+                <apex:outputText value="{! wrapData.inserted}" style="color:green" />
+                <p><b>Number of Records Successfully updated:&nbsp;</b></p>
+                <apex:outputText value="{! wrapData.updated}" style="color:blue" />
+                <p><b>Number of Failed Records:&nbsp;</b></p>
+                <apex:outputText value="{! wrapData.failed}" style="color:red" />
+            </apex:pageBlockSection><br/>
+        </apex:pageBlock>
+    </apex:form>
+    
+</apex:page>

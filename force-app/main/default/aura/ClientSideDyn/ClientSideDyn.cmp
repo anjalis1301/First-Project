@@ -1,0 +1,81 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickAction,force:hasSObjectName" 
+                controller='ClientSidePaginationDynamicController'
+                access="global" >
+    <!-- call the doInit method to load the list of All the Available Objects into the Org -->
+    <aura:handler name='init' value='{!this}' action='{!c.doInit}' />
+    <aura:attribute name='objectList' type='List' />
+    <aura:attribute name="data" type='List' default='[]' />
+    <aura:attribute name="isSending" type="boolean" />
+    <aura:attribute name="options" type="List" default="[]"/>
+    <aura:attribute name="values" type="List" default="[]"/>
+    <aura:attribute name="selectedFields" type="List" default = "[]" />
+    <aura:attribute name="fieldsList" type="list" default="[]"/>
+    <aura:attribute name="fieldNameList" type="list" default="[]" />   
+    <aura:attribute name="tableFields" type="list" default="[]" />
+    <aura:attribute name="allData" type="List" default="[]" />
+    <aura:attribute name="sortBy" type="String" default="Id" />
+    <aura:attribute name="sortDir" type="String" default ="asc" />
+    <aura:attribute name = "displayDataTable" type="boolean" default="false"/>
+    
+    <div class="slds-m-around_small">
+        <div class="slds-grid slds-wrap">
+            <div class="slds-size_1-of-2">
+                <div class="slds-box_x-small">
+                    <!-- show the list of All the Object -->
+                    <lightning:select name="selectObject" label="Select an Object" onchange="{!c.doHandleChange}" aura:id='selectObject'>
+                        <option value="" text="- None -" disabled="true" />
+                        <aura:iteration items='{!v.objectList}' var='obj'>
+                            <option value="{!obj.key}" text="{!obj.value}" />
+                        </aura:iteration>
+                    </lightning:select>
+                    <lightning:dualListbox aura:id="dualList" name="allFields"
+                                           label= "Select Fields"
+                                           sourceLabel="Available Fields"
+                                           selectedLabel="Selected Fields"
+                                           
+                                           onchange="{! c.handleChange }"/>
+                </div>
+            </div>
+            <lightning:button label="Process" variant="base" onclick="{!c.handleClick}"/>
+            <br/>   
+        </div>
+    </div>
+    
+    
+    <aura:if isTrue="{!v.displayDataTable}">
+        <div class="slds-m-around_small"> 
+            <p class="slds-p-horizontal_small slds-box"> 
+                <lightning:datatable aura:id="table" data="{!v.allData}" columns="{!v.tableFields}" sortedBy="{!v.sortBy}" sortedDirection="{!v.sortDir}" onsort="" onrowselection="" keyField="Id" /> 
+            </p>
+        </div>
+        
+    <div >
+        <div class="slds-m-around_small">
+            <table class="slds-table slds-table--bordered slds-table--cell-buffer slds-box" style="height:300px">
+                <thead>
+                    <tr class="slds-text-heading--label">
+                        <th>
+                            <lightning:input type="checkbox" label="SelectAll" name="allCheck" />
+                        </th>
+                        <aura:iteration items="{!v.fieldsList}" var="ct">
+                            <th scope="col" class="slds-is-sortable">
+                                <div class="slds-truncate" title="{!ct.label}" onclick="{!c.sortAction}">{!ct.label}</div>
+                            </th>
+                        </aura:iteration>
+                    </tr>
+                </thead>
+                <tbody>
+                    <aura:iteration items="{!v.data}" var="acc">
+                        <tr> <td><lightning:input type="checkbox" value=""/></td> 
+                            <aura:iteration items="{!acc.values}" var="col">
+                               <td>{!col.value}</td>
+                            </aura:iteration>
+                        </tr>
+                    </aura:iteration>
+                </tbody>
+            </table>
+        </div>
+    </div>
+        
+</aura:if>
+</aura:component>

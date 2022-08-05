@@ -1,0 +1,7 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,lightning:isUrlAddressable" access="global" >
+   <aura:attribute name="tabState" type="String" />
+    <aura:handler name="change" value="{!v.pageReference}" action="{!c.reInit}" />
+    <aura:handler name="init" value="{!this}" action="{!c.init}" />
+    <p>{!v.tabState}parent</p>
+    <c:tabsAndButton  onclicked="{!c.fetchTabId}"></c:tabsAndButton>
+</aura:component>

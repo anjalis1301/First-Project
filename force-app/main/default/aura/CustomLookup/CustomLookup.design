@@ -1,0 +1,7 @@
+<design:component>
+	<design:attribute name="objectName" default="Account"/>
+    <design:attribute name="fieldName" default="Name"/>
+    <design:attribute name="Label" />
+    <design:attribute name="iconName" default="action:new_account"/>
+    <design:attribute name="placeholder" 	 default="Search..." description="placeholder for input Box" />
+</design:component>

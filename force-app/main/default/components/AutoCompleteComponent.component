@@ -1,0 +1,81 @@
+<apex:component Controller="AutoCompleteComponentController" allowDML="true">
+    <script src="https://code.jquery.com/jquery-1.8.2.js"></script>
+    <script src="https://code.jquery.com/ui/1.9.0/jquery-ui.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.9.1/themes/base/jquery-ui.css"/>
+    
+    <apex:attribute name="obj" type="String" description="object That is passed " />
+    <apex:attribute name="fld" type="String"  description="fields That is passed "/>
+    <apex:attribute name="index" type="String"  description="Unique index for this component in the page" />
+    <apex:form id="frm">
+        <apex:pageBlockSection collapsible="false" title="Search {!obj}" >
+            <input  id="searchRecords{!index}" value="" />    
+        </apex:pageBlockSection>
+        
+        <script>
+        var idx ='{!index}';
+        $(function(){ 
+            var objName='{!obj}' ;
+            var fl ='{!fld}';
+            $("#searchRecords{!index}").autocomplete({  
+                source: function(request, response){
+                    var stSearch = request.term;  
+                    AutoCompleteComponentController.autoCompleteRecords(stSearch,objName,function(result, event){  
+                        if(event.status){  
+                            if(typeof result === 'undefined' || result.length <=0){  
+                                response(['No Record Found']);  
+                            }else {  
+                                response(result);  
+                            }  
+                        }else {  
+                            response([]);  
+                        }  
+                    },  
+                                                                        {escape: true}  
+                                                                       );  
+                },  
+                select: function(event, ui){  
+                    if(ui.item.label != 'No Record Found'){  
+                        $("#searchRecords{!index}").val(ui.item.label);
+                        showFields_{!index}(ui.item.value,fl,objName);
+                    }
+                    else {
+                        $("#searchRecords{!index}").val('');
+                    }
+                    return false;  
+                },  
+                focus: function( event, ui) {  
+                    $("#searchRecords{!index}").val(ui.item.label);  
+                    return false;  
+                }  
+            });  
+        }); 
+        
+        </script>
+        <apex:pageMessages />
+        
+        <apex:actionFunction name="showFields_{!index}" action="{!displayObjectDetail}" reRender="fieldToDisplay" >
+            <apex:param assignTo="{!selectedId}" value="" name="selectedId"/>
+            <apex:param assignTo="{!fields}" value="" name="fields" />
+            <apex:param assignTo="{!objName}" value="" name="objName" />
+        </apex:actionFunction>
+        <apex:actionRegion >
+            <apex:pageBlock id="fieldToDisplay" mode="inlineEdit" >
+                <apex:pageBlock id="detailsBlock" rendered="{!showDetail}" >
+                    <apex:pageBlockSection collapsible="true" title="{!obj} Detail" id="dataDisplay">
+                        <apex:repeat value="{!fieldName}" var="choosenFields">
+                            <apex:outputField value="{!record[choosenFields]}" >
+                                <apex:inlineEditSupport event="ondblClick" />
+                            </apex:outputField>
+                        </apex:repeat>
+                    </apex:pageBlockSection>
+                    <center>
+                        <apex:commandButton value="Save" id="saveButton"  action="{!save}">
+                            <!--apex:actionSupport  event="onclick" action="{!save}" reRender="fieldToDisplay"/-->
+                        </apex:commandButton>
+                        <apex:commandButton value="Cancel" id="cancelButton" reRender="fieldToDisplay" onclick="resetInlineEdit()" style="display:none;" />
+                    </center>
+                </apex:pageBlock>
+            </apex:pageBlock>
+        </apex:actionRegion>
+    </apex:form>
+</apex:component>

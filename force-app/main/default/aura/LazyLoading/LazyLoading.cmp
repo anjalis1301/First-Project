@@ -1,0 +1,25 @@
+<aura:component controller="LazyLoadingController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:attribute name="objName" type="String" default="Account" />
+    <aura:attribute name="fields" type="String" default="Name,Website"/>
+    <aura:attribute name="dataList" type="List" default="[]" />
+    <aura:attribute name="tableHeaders" type="List" default="[]" />
+    <aura:attribute name="sortBy"  type="String" default="Id"/>
+    <aura:attribute name="sortDirection" type="String" default="asc" />
+    <aura:attribute name="enableLazyLoading" type="Boolean" default = "true" />
+    <aura:attribute name="totalAccounts" type="Integer" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <div class="slds-box slds-theme_shade slds-theme_alert-texture">
+        <div class="slds-text-align_center slds-text-heading_large">Lazy Loading</div><br /><br />
+        <div style="height:500px;">
+            <lightning:datatable keyField = "Id" 
+                                data = "{!v.dataList}" 
+                                columns = "{!v.tableHeaders}" 
+                                enableInfiniteLoading = "{!v.enableLazyLoading}"
+                                onloadmore = "{!c.loadMoreData}"
+                                sortedBy = "{!v.sortBy}"
+                                sortedDirection = "{!v.sortDirection}"
+                                onsort = "{!c.sortDataByColumn}"
+                                />
+        </div>
+    </div>
+</aura:component>

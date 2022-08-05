@@ -1,0 +1,108 @@
+<apex:page standardController="Account" extensions="FileUploadController">
+    <link rel="stylesheet" type="text/css" href="{!$Resource.FileUploadCss}"/>
+    <script type="text/javascript">
+    var parentId  = "{!Account.id}";
+    var files;
+    var obj = new Object();
+    var i = 0;
+    var base64Value;
+    //method to read the uploaded attachment and store it in an object
+    function prepareUpload() {
+          files = document.getElementById('filesInput').files;
+        if(i < files.length){
+            if(files.length == 0){
+                return;
+            }
+            var uploadMarkup = '';
+            if(files[i].size < 1000000) {
+                var size = Math.floor(files[i].size/1000);
+                var displaySize = size + 'K';
+            } else {
+                var size = Math.round((files[i].size / 1000000)*10)/10;
+                var displaySize = size + 'MB';
+            }
+            //For each file being uploaded create a div to represent that file, includes file size, status bar, etc.
+            uploadMarkup += '<div class="upload" id="uploadDiv">';
+            uploadMarkup += '<div class="fileName"><span class="name">'+ files[i].name + '</span> - '+ displaySize+ '</div>';
+            uploadMarkup += '<div class="percentComplete" id="perCom'+i+'">0%</div>'
+            uploadMarkup += '<div class="clear"/>';
+            uploadMarkup += '<div class="statusBar" style="width:100%;">';
+            uploadMarkup += '<div class="statusBarPercent" id="barPer'+i+'"/>';
+            uploadMarkup += '</div>';
+            uploadMarkup += '</div>';
+            var fileBody = files[i];
+            var reader = new FileReader();
+            reader.readAsBinaryString(fileBody);
+            document.getElementById('status').innerHTML += uploadMarkup;
+            reader.onload = function(evt) {
+                if(evt.target.readyState == FileReader.DONE) {
+                    base64Value = window.btoa(evt.target.result);
+                    obj[files[i].name] = base64Value;
+                    remotingCall();
+                } 
+            }
+        } else {
+            document.getElementById("boxText").innerHTML = "Processing Completed";
+        	 setTimeout("window.open('/'+parentId,'_parent');",1000);
+        }
+    }
+    
+    // Method to invoke remote action
+    function remotingCall() {
+        document.getElementById("boxText").innerHTML = "Uploding...Please Wait";
+        var objToString = JSON.stringify(obj);
+        FileUploadController.attachBlob(parentId,objToString,function(result,event) {
+            if(event.status == true) {
+                var element = document.getElementById("barPer"+i);
+                var data = document.getElementById("perCom"+i);
+                var width = 1;
+                var identity = setInterval(scene, 10);
+                function scene() {
+                    if (width >= 100) {
+                        clearInterval(identity);
+                        i++;
+                        Object.keys(obj).forEach(k => delete obj[k]);
+                   		prepareUpload(); 
+                    } else {
+                        width++;
+                        data.innerHTML = width+'%';
+                        element.style.width = width + '%';
+                    }
+                }     
+            }
+            else {
+            	var element = document.getElementById("barPer"+i);
+                var data = document.getElementById("perCom"+i);
+                var width = 1;
+                var identity = setInterval(scene, 10);
+                function scene() {
+                    if (width >= 50) {
+                        clearInterval(identity);
+                        i++;
+                        Object.keys(obj).forEach(k => delete obj[k]);
+                   		prepareUpload(); 
+                    } else {
+                        width++;
+                        data.innerHTML = 'File Size Too Big';
+                        element.style.width = width + '%';
+                    }
+                }
+            }
+        });
+    }
+    
+    //to change text when files dragover
+    function allowDrop(ev) {
+        document.getElementById("boxText").innerHTML = "Drop Here...";
+    }
+    </script>
+    
+    <apex:pageMessages id="showMsg" />
+    <div class="uploadBox" id="box">
+        <span id="boxText" >Click To Choose File Or Drop Here</span>
+        <input type="file" multiple="true" id="filesInput" name="file" onchange = "prepareUpload()" class="inputfile" ondragover="allowDrop(event)"/>
+    </div>
+    <div id="text" style="padding-top:10px;"></div>
+    <div id ="status" style="padding-top:10px;"></div>
+    
+</apex:page>

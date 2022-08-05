@@ -1,0 +1,61 @@
+<aura:component controller="ClientSideController" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+    <aura:attribute name="completeData" type="Account[]" />
+    <aura:attribute name="header" type="List" />
+    <aura:attribute name="displayList" type="Account[]" />
+    <aura:attribute name="recPerPage" type="Integer" default="10"/>
+    <aura:attribute name="currentPage" type="Integer" default="1"/>
+    <aura:attribute name="sortField" type="String" />
+    <aura:attribute name="sortOrder" type="String" />
+    <aura:attribute name="totalPages" type="Integer" />
+    <aura:attribute name="selectedIds" type="List" />
+    <aura:attribute name="recordsPerPg" type="Boolean" default="false"/>
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <div class="slds-box slds-theme_shade slds-theme_alert-texture">
+     <div class="slds-text-align_center slds-text-heading_large">CLIENT SIDE PAGINATION</div>
+        <div class="slds-m-around_small" > 
+            <p class="slds-p-horizontal_small slds-box" style="height:400px;"> 
+                <lightning:datatable aura:id="recordsTable" data="{!v.displayList}" columns="{!v.header}" sortedBy="{!v.sortField}" sortedDirection="{!v.sortOrder}" onsort="{!c.sortByField}" onrowselection="{!c.rowSelected}" keyField="Id" /> 
+            </p>
+        </div>
+        <div class="slds-grid slds-grid_align-space " >
+            <div class="slds-col slds-float_left" style="margin: -20px;">
+                Records Per Page &nbsp;&nbsp;<lightning:select aura:id="rec" value="10" onchange="{!c.onrecordChange}" class="slds-show_inline-block" >
+                <option label="10" value="10" />
+                <option label="15" value="15" />
+                <option label="20" value="20" />
+                </lightning:select>
+            </div>
+            <div class="slds-col ">
+                <lightning:button  variant="brand" aura:id="first" label="First" title="First" onclick="{!c.navigate}" />
+                <lightning:button  variant="brand" aura:id="prev" label="Previous" title="Previous" onclick="{!c.navigate}" />
+                <lightning:button disabled="{!v.currentPage == v.totalPages}" variant="brand" label="Next" title="Next" onclick="{!c.navigate}" />
+                <lightning:button disabled="{!v.currentPage == v.totalPages}" variant="brand" label="Last" title="Last" onclick="{!c.navigate}" />
+            </div>
+            <div class="slds-col ">
+                <lightning:layout>
+
+                <aura:if isTrue="{!(v.currentPage - 2) > 1}" >
+                    <lightning:button  iconName="utility:left" title="Previous" variant="base"  onclick="{!c.navigate}" />
+                </aura:if>
+                 <aura:if isTrue="{!greaterthanorequal(v.totalPages,1)}" >   
+                <lightning:button aura:id="btn1" label="1" onclick="{!c.navigateNumberClick}" />
+                    </aura:if> <aura:if isTrue="{!greaterthanorequal(v.totalPages,2)}" >
+                <lightning:button aura:id="btn2" label="2" onclick="{!c.navigateNumberClick}" />
+                    </aura:if> <aura:if isTrue="{!greaterthanorequal(v.totalPages,3)}" >
+                <lightning:button aura:id="btn3" label="3" onclick="{!c.navigateNumberClick}" />
+                    </aura:if><aura:if isTrue="{!greaterthanorequal(v.totalPages,4)}" >
+                <lightning:button aura:id="btn4" label="4" onclick="{!c.navigateNumberClick}" /> 
+                    </aura:if><aura:if isTrue="{!greaterthanorequal(v.totalPages,5)}" >
+                <lightning:button aura:id="btn5" label="5" onclick="{!c.navigateNumberClick}" />
+                    </aura:if>
+                <aura:if isTrue="{!lessthan((v.currentPage * 1) + 2 ,v.totalPages)}" >
+                    <lightning:button  iconName="utility:right" title="Next" variant="base"  onclick="{!c.navigate}" />
+                </aura:if>
+                </lightning:layout> 
+            </div>
+            <div class="slds-col">
+                <p class="slds-float_right">Total Accounts   <br/> Page {!v.currentPage} / {!v.totalPages}</p>
+            </div>
+        </div>
+    </div>
+</aura:component>

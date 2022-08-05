@@ -1,0 +1,12 @@
+<template>
+    <template if:true={show}>
+        <h3 class="slds-tile__title slds-truncate" title={record.Id}>
+            <a onclick={editRecord}>
+                <span class="slds-truncate" data-id={record.Id} id={record.Id}>{data}</span>
+            </a>
+        </h3>
+    </template>
+    <template if:false={show}>
+        <p class="slds-truncate" title={record.Id} >{data}</p>
+    </template>
+</template>

@@ -1,0 +1,9 @@
+<apex:page controller="ComponentController" action="{!downloadCSV}" cache="true" contentType="application/vnd.ms-excel#export.csv" >
+    {!fieldOption}{!nextLine}
+    <apex:repeat value="{!queryedRecords}" var="obj">
+    	<apex:repeat value="{!fieldsToShow}" var="fd">
+            {!obj[fd]}{!coma}
+        </apex:repeat>
+        {!nextLine}
+    </apex:repeat>
+</apex:page>

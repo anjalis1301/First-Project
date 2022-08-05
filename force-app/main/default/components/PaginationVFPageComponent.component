@@ -1,0 +1,176 @@
+<!--Author---- Anjali Sharma
+createDate-----
+Purpose---- The component that is added at the bottom of a page to show records of selected object  
+-->
+
+<apex:component controller="ComponentController" allowDML="true" >
+    
+    <apex:attribute name="attr" type="String" assignTo="{!fromValue}" description="object That is passed "/>
+    <apex:attribute name="fieldss" type="String[]" assignTo="{!fieldOption}" description="fields to process"/>
+    
+    <script>
+    var count=0;
+	var previousCount=0; 
+    function chkMasterClick(){
+        var masterCheckbox = document.getElementsByClassName("masterCheckbox");
+        var inputCheckbox = document.getElementsByClassName("singleCheckbox");
+        for(var i=0; i<inputCheckbox.length; i++)
+        {
+            if(masterCheckbox[0].checked){
+        		if(!(inputCheckbox[i].checked)){
+                	count++;
+                }
+        	}
+         	else{
+            	if(inputCheckbox[i].checked){
+                	count--;
+                }
+            }
+            inputCheckbox[i].checked = masterCheckbox[0].checked;
+        } 
+        showChecked();
+    }
+    
+    function chkChildClick(){
+        var counter=0;
+        var bool=false;
+        var c=false;
+        var masterCheckbox = document.getElementsByClassName("masterCheckbox");
+        var inputCheckbox = document.getElementsByClassName("singleCheckbox");
+        for(var i=0;i<inputCheckbox.length;i++){
+            if(inputCheckbox[i].checked){
+                counter++;
+                bool=true;
+            }
+            
+        }
+        /* if(counter < previousCount){
+            alert('inprev');
+            count=count-2 ;
+        }
+        previousCount=counter;
+        if(bool){count++;bool=false;}*/
+        //if(c){count--;c=false;}
+        if(counter == inputCheckbox.length){
+            masterCheckbox[0].checked=true;
+        }
+        else{
+            masterCheckbox[0].checked =false;
+        }
+        showChecked();
+    }
+    function showChecked(){
+        document.getElementById('selectedchk').innerHTML=count;  
+    }
+    
+    function confirmDelete(){
+    	confirm('Are you sure ');
+        deleteSelected();
+    }
+    
+    function checkMethodd(csvStr){
+        var encodedUri = 'data:text/csv;charSet=utf-8,';
+        var use=csvStr;
+        encodedUri=encodedUri +  encodeURI(use);
+        var link = document.createElement("a");
+        link.setAttribute("href", encodedUri);    
+        link.setAttribute("download", "Records_Info.csv");
+        link.setAttribute("target","_blank");
+        document.body.appendChild(link);
+        link.click();
+    }
+    </script>
+    
+    <apex:pageMessages id="msg"/>        
+    <apex:pageBlock id="recordBlock"  >
+        <apex:outputPanel layout="Block" id="recordsPanel" >
+            <div>
+                <table width="100%" >
+                    <tr> 
+                        <td >
+                            <apex:commandButton value="NewRecord" onclick="window.open('/{!newRecordPrefix}/e?retURL=apex/PaginationVfPage','_blank')" reRender="none" />                     
+                            <apex:actionFunction action="{!deleteSelectedRecords}" name="deleteSelected" reRender="recordBlock,msg" status="spin" />    
+                            <apex:commandButton value="Delete Selected" onclick="confirmDelete()"  reRender="recordBlock"  />
+                            <apex:commandButton action="{!downloadCSV}"  value="Download CSV" oncomplete="checkMethodd('{!csvString}')" reRender="recordBlock" status="spin" />                           
+                        </td>
+                        <td align="right" >                           
+                            <apex:repeat value="{!characters}" var="char"  rendered="{!if(fromValue == 'Case' || fromValue == 'Solution' || fromValue == 'Idea',false,true)}">                               
+                                <apex:commandLink value=" {!char} " action="{!refreshList}" reRender="recordBlock" status="spin"  >
+                                    <apex:param name="filter" value="{!char}" />
+                                </apex:commandLink>|
+                            </apex:repeat>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+            <apex:actionFunction action="{!initiate}" name="initiate" reRender="component,recordBlock" status="spin" oncomplete="chkChildClick()" />
+            <div style="overflow-y: scroll; height: 250px;">               
+         		<apex:pageBlockTable value="{!wrapList}" var="cnt" id="recordTable" >
+                    <apex:column >
+                        <apex:facet name="header">
+                            <apex:inputCheckbox onclick="chkMasterClick()" id="masterChk" styleClass="masterCheckbox"  >
+                            	<apex:actionSupport event="onchange" action="{!StateMaintain}" reRender="recordBlock" />
+                            </apex:inputCheckbox>
+                        </apex:facet>
+                        <apex:inputCheckbox onclick="chkChildClick()" value="{!cnt.check_box}" id="childChk"  styleClass="singleCheckbox" >
+                            <apex:actionSupport event="onchange" action="{!StateMaintain}" reRender="recordBlock" />
+                        </apex:inputCheckbox>
+                    </apex:column>
+                    <apex:column headerValue="Action" >
+                        <apex:outputLink value="/{!cnt.obj.Id}/e?retURL=apex/PaginationVfPage" target="_blank" >
+                            Edit
+                        </apex:outputLink>|
+                        <apex:commandLink value="Del"  id="dOR" action="{!deleteOneRec}" reRender="recordBlock,msg" status="spin">
+                            <apex:param name="recId" value="{!cnt.obj.Id}"/>
+                        </apex:commandLink>
+                    </apex:column>
+                    <apex:repeat value="{!fieldsToShow}" var="show">
+                        <apex:column value="{!cnt.obj[show]}" >
+                            <apex:facet name="header">
+                                <apex:commandLink value="{!$ObjectType[fromValue].fields[show].Label} {!if(show=sortByValue,sortDirection,'')}" action="{!sortByCol}" style="display:block" status="spin" reRender="recordBlock" oncomplete="chkChildClick()"  >
+                                    <apex:param name="colName" value="{!show}" assignTo="{!sortByValue}"/>
+                                </apex:commandLink>
+                            </apex:facet>
+                        </apex:column>    
+                    </apex:repeat>
+                </apex:pageBlockTable>
+            </div>
+            <div>
+                <!-- Pagination -->
+                <table width="100%">
+                    <tr>
+                        <td align="left">
+                            <!-- Records per page -->
+                            <apex:selectList value="{! RecordsOnPage }" size="1">
+                                <apex:selectOptions value="{!RecordsOnPageList}" />                                
+                                <apex:actionSupport event="onchange" action="{!changeRecordsOnPage }" reRender="recordBlock" status="spin" oncomplete="chkChildClick" />                              
+                            </apex:selectList>
+                            &nbsp;&nbsp;&nbsp;
+                            	<apex:outputLabel >{!count} Selected records</apex:outputLabel>
+                                <!--<span id="selectedchk">0</span>Selected-->
+                            
+                        </td>
+                        <td align="center">
+                            <!-- Previous page -->
+                            <!-- active -->
+                            <apex:commandButton action="{! first }" value=" First" disabled="{! NOT(setCon.HasPrevious) }" reRender="recordBlock" status="spin" oncomplete="chkChildClick()"/>
+                            <apex:commandButton action="{! previous }" value=" Previous" disabled="{! NOT(setCon.HasPrevious) }" reRender="recordBlock" status="spin" oncomplete="chkChildClick()"/>
+                            &nbsp;&nbsp;
+                            <!-- Next page -->
+                            <!-- active -->
+                            <apex:commandButton action="{! next }" value="Next " disabled="{! NOT(setCon.HasNext) }" reRender="recordBlock" status="spin" oncomplete="chkChildClick()" />                        
+                            <apex:commandButton action="{! last }" value="Last" disabled="{! NOT(setCon.HasNext) }" reRender="recordBlock" status="spin" oncomplete="chkChildClick()"/>         
+                        </td>
+                        <td align="right">
+                            <!-- Page X of Y -->
+                            Page:
+                            <apex:inputText value="{! PageNumber }" tabindex="0" size="2"  />
+                            <apex:actionSupport event="onkeyup" action="{! changePageNumber }" reRender="recordBlock"  status="spin" />
+                            <apex:outputText value=" of {! CEILING(setCon.ResultSize / setCon.PageSize) }" />
+                        </td>                     
+                    </tr>
+                </table>                    
+            </div>
+        </apex:outputPanel>
+    </apex:pageBlock>
+</apex:component>

@@ -1,0 +1,6 @@
+<apex:page tabStyle="Contact">
+    <apex:pageBlock >
+        <c:AutoCompleteComponent obj="Contact" fld="FirstName,LastName,Fax,Phone,Email" index="1"/>
+        <c:AutoCompleteComponent obj="Account" fld="Name,AccountNumber,Fax,Phone" index="2"/>
+    </apex:pageBlock>
+</apex:page>

@@ -1,0 +1,250 @@
+/*************************************************************************************@@
+Class Name     :  BoxIntegrationTest
+Purpose        :  Test class for BoxIntegrationTest
+DATE           :  22/04/2021
+Author         :  Anjali Sharma
+*********************************************************************************************************/
+@isTest
+private class BoxIntegrationTest {
+    
+	//setup method to create a community user and insert the record integration data object
+	@TestSetup
+    public static void createData(){
+        Id profileId = [select id from profile where name='Custom Customer Community Plus Login User'].id;
+        Account ac = new Account(name ='TestAccount') ;
+        insert ac;        
+        Contact con = new Contact(LastName ='testCon',AccountId = ac.Id);
+        insert con;
+        
+        User usr = new User(alias = 'test123', email='test123@noemail.com',
+        emailencodingkey='UTF-8', lastname='Testing', languagelocalekey='en_US',
+        localesidkey='en_US', profileid = profileId, country='United States',IsActive =true,
+        ContactId = con.Id,
+        timezonesidkey='America/Los_Angeles', username='tester@noemail.com');
+        insert usr;
+        
+        System.runAs(usr){
+            Integration_Data__c objData = new Integration_Data__c(AccessToken__c = 'fakeAccessToken123',RefreshToken__c='fakeRereshToken1233',UserId__c = usr.Id,IntegrationApp__c = 'Box');
+        	insert objData;
+        }
+        
+    }
+    
+	//For test boxAuthorizationTest method when Integration_Data__c object has no records
+		@isTest  
+    	public static void boxAuthorizationTest() {
+            Test.startTest();
+            BoxIntegration.AuthCodeData authData = new BoxIntegration.AuthCodeData();
+            authData = BoxIntegration.boxAuthorization();
+            system.assertNotEquals(true, authData.Flag);
+            Test.stopTest();                    
+    }
+    
+    //For test boxAuthorizationTest method  when Integration_Data__c object has records
+    @isTest  
+    public static void boxAuthorizationUserTest() {
+        User u = [SELECT Id FROM User WHERE UserName='tester@noemail.com'];
+        System.runAs(u) {
+            Test.startTest();
+            BoxIntegration.AuthCodeData authData = new BoxIntegration.AuthCodeData();
+            authData = BoxIntegration.boxAuthorization();
+            system.assertNotEquals(false, authData.Flag);
+            Test.stopTest();                    
+        }
+    }   
+             
+    @isTest
+    //For test fetchAccessTokenTest method    
+    public static void fetchAccessTokenTest() {
+        User u = [SELECT Id FROM User WHERE UserName='tester@noemail.com'];
+        System.runAs(u){
+            Test.setMock(HttpCalloutMock.class, new BoxIntegrationMockResponse());
+            Test.startTest();
+            BoxIntegration.fetchAccessToken('FakeAuthCode1233333k');
+            Test.stopTest();
+        }
+    }
+    
+    //For test getDropboxFilesTest method 
+    @isTest   
+    	public static  void getBoxFilesTest(){
+            User u = [SELECT Id FROM User WHERE UserName='tester@noemail.com'];
+            System.runAs(u){
+                Test.setMock(HttpCalloutMock.class, new BoxIntegrationMockResponse());           
+                Test.startTest();                    
+                   List<BoxIntegrationWrapper.FileWrapper1> data =  BoxIntegration.getBoxFiles('0');
+                   System.assertEquals(data.size(), 10);           
+                Test.stopTest();
+            }
+    }
+	
+    //For test getDropboxFilesTest with accessToken generated bt refresh Token method 
+        @isTest   
+            public static  void getBoxFilesRefreshTest(){
+                User u = [SELECT Id FROM User WHERE UserName='tester@noemail.com'];
+                System.runAs(u){
+                    Test.setMock(HttpCalloutMock.class, new BoxIntegrationMockResponse());
+                    Integration_Data__c temp = [SELECT AccessToken__c,RefreshToken__c FROM Integration_Data__c WHERE AccessToken__c='fakeAccessToken123'];
+                    	temp.AccessToken__c = 'wrongAccessToken';
+                    	update temp;
+                    Test.startTest();
+                       List<BoxIntegrationWrapper.FileWrapper1> data =  BoxIntegration.getBoxFiles('0');
+                       System.assertEquals(data.size(), 10);           
+                    Test.stopTest();
+                }
+        }    
+  
+     //For test displayFile method
+     @isTest    
+    public static void displayFileTest(){
+        User u = [SELECT Id FROM User WHERE UserName='tester@noemail.com'];
+        System.runAs(u) {
+            Test.setMock(HttpCalloutMock.class, new BoxIntegrationMockResponse());
+            Test.startTest();
+                String url = BoxIntegration.displayFile('802570035549');
+                System.assertNotEquals(null, url);
+            Test.stopTest();
+        }
+    }
+    
+    //For test displayFile method with accessToken generated by refresh Token method
+     @isTest    
+    public static void displayFileTest2(){
+        User u = [SELECT Id FROM User WHERE UserName='tester@noemail.com'];
+        System.runAs(u) {
+            Test.setMock(HttpCalloutMock.class, new BoxIntegrationMockResponse());
+            Integration_Data__c temp = [SELECT AccessToken__c,RefreshToken__c FROM Integration_Data__c WHERE AccessToken__c='fakeAccessToken123'];
+                    	temp.AccessToken__c = 'wrongAccessToken';
+                    	update temp;
+            Test.startTest();
+                String url = BoxIntegration.displayFile('802570035549');
+                System.assertNotEquals(null, url);
+            Test.stopTest();
+        }
+    }
+   
+     //For test createNewFolder method 
+    @isTest   
+    public static void createNewFolderTest() {
+        User u = [SELECT Id FROM User WHERE UserName='tester@noemail.com'];
+        System.runAs(u) {
+            Test.setMock(HttpCalloutMock.class, new BoxIntegrationMockResponse());
+            Test.startTest();
+            List<BoxIntegrationWrapper.FileWrapper1> data =  BoxIntegration.createNewFolder('0','TestData');
+            System.assertNotEquals(null, data);
+            Test.stopTest();
+        }
+    }
+    
+    //For test createNewFolder method with accessToken generated by refresh Token method
+    @isTest   
+    public static void createNewFolderTest2() {
+        User u = [SELECT Id FROM User WHERE UserName='tester@noemail.com'];
+        System.runAs(u) {
+            Test.setMock(HttpCalloutMock.class, new BoxIntegrationMockResponse());
+            Integration_Data__c temp = [SELECT AccessToken__c,RefreshToken__c FROM Integration_Data__c WHERE AccessToken__c='fakeAccessToken123'];
+                    	temp.AccessToken__c = 'wrongAccessToken';
+                    	update temp;
+            Test.startTest();
+            List<BoxIntegrationWrapper.FileWrapper1> data =  BoxIntegration.createNewFolder('0','TestData');
+            System.assertNotEquals(null, data);
+            Test.stopTest();
+        }
+    }
+    
+    //For test deleteSelected method 
+    @isTest
+    public static void deleteSelectedTest() {
+        User u = [SELECT Id FROM User WHERE UserName='tester@noemail.com'];
+        System.runAs(u){
+            Test.setMock(HttpCalloutMock.class, new BoxIntegrationMockResponse());       
+            Test.startTest();
+                List<BoxIntegrationWrapper.FileWrapper1> data =  BoxIntegration.deleteSelected('0','file','856321452');
+            	List<BoxIntegrationWrapper.FileWrapper1> data1 =  BoxIntegration.deleteSelected('0','folder','85630999821452');
+                System.assertNotEquals(null, data);
+            Test.stopTest();
+        }
+    } 
+    
+    //For test deleteSelected method with accessToken generated by refresh Token method
+    @isTest
+    public static void deleteSelectedTest2() {
+        User u = [SELECT Id FROM User WHERE UserName='tester@noemail.com'];
+        System.runAs(u){
+            Test.startTest();
+            Integration_Data__c temp = [SELECT AccessToken__c,RefreshToken__c FROM Integration_Data__c WHERE AccessToken__c='fakeAccessToken123'];
+                    	temp.AccessToken__c = 'wrongAccessToken';
+            			temp.RefreshToken__c = 'wrongRefreshToken';
+                    	update temp;
+            Test.setMock(HttpCalloutMock.class, new BoxIntegrationMockResponse());       
+            Test.stopTest();
+                List<BoxIntegrationWrapper.FileWrapper1> data =  BoxIntegration.deleteSelected('0','file','856321452');
+                System.assertNotEquals(null, data);
+            
+        }
+    } 
+    
+    //For test downloadSelected method  
+    @isTest  
+    public static void downloadSelectedTest() {
+        User u = [SELECT Id FROM User WHERE UserName='tester@noemail.com'];
+        System.runAs(u) {
+            Test.setMock(HttpCalloutMock.class, new BoxIntegrationMockResponse());
+            Test.startTest();
+                String link = BoxIntegration.downloadSelected('802570035549');
+                System.assertNotEquals(null, link);
+            Test.stopTest();
+        }
+    }
+    
+    //For test downloadSelected method with accessToken generated by refresh Token method
+    @isTest  
+    public static void downloadSelectedTest2() {
+        User u = [SELECT Id FROM User WHERE UserName='tester@noemail.com'];
+        System.runAs(u) {
+            Test.setMock(HttpCalloutMock.class, new BoxIntegrationMockResponse());
+            Integration_Data__c temp = [SELECT AccessToken__c,RefreshToken__c FROM Integration_Data__c WHERE AccessToken__c='fakeAccessToken123'];
+                    	temp.AccessToken__c = 'wrongAccessToken';
+                    	update temp;
+            Test.startTest();
+                String link = BoxIntegration.downloadSelected('802570035549');
+                System.assertNotEquals(null, link);
+            Test.stopTest();
+        }
+    }
+        
+    //For test uploadSelectedData method
+    @isTest    
+    public static void uploadSelectedDataTest() {
+        User u = [SELECT Id FROM User WHERE UserName='tester@noemail.com'];
+        System.runAs(u) {
+            Test.setMock(HttpCalloutMock.class, new BoxIntegrationMockResponse());
+            Test.startTest();
+            String fileName = 'test';
+            String fileBody = 'testing1234==';
+            List<BoxIntegrationWrapper.FileWrapper1> data =  BoxIntegration.uploadSelectedData('0',fileName,fileBody);
+             data =  BoxIntegration.uploadSelectedData('0',fileName,'testing1234=');
+            data =  BoxIntegration.uploadSelectedData('0',fileName,'testing1234');
+            System.assertNotEquals(null, data);
+            Test.stopTest();
+        }
+    }
+    
+    //For test uploadSelectedData method with accessToken generated by refresh Token method
+    @isTest    
+    public static void uploadSelectedDataTest2() {
+        User u = [SELECT Id FROM User WHERE UserName='tester@noemail.com'];
+        System.runAs(u) {
+            Test.setMock(HttpCalloutMock.class, new BoxIntegrationMockResponse());
+            Integration_Data__c temp = [SELECT AccessToken__c,RefreshToken__c FROM Integration_Data__c WHERE AccessToken__c='fakeAccessToken123'];
+                    	temp.AccessToken__c = 'wrongAccessToken';
+                    	update temp;
+            Test.startTest();
+            String fileName = 'test';
+            String fileBody = 'testing1234';
+            List<BoxIntegrationWrapper.FileWrapper1> data =  BoxIntegration.uploadSelectedData('0',fileName,fileBody);
+            System.assertNotEquals(null, data);
+            Test.stopTest();
+        }
+    }
+}

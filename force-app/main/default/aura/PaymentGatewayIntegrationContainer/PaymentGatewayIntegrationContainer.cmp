@@ -1,0 +1,9 @@
+<aura:component implements="forceCommunity:availableForAllPageTypes">
+    <aura:attribute name="display" type="Boolean" />
+    <aura:if isTrue="{!!v.display}">
+        <c:paymentGateway onswitch="{!c.showECheckComp}" />
+    </aura:if>
+    <aura:if isTrue="{!v.display}">
+        <c:paymentGatewayECheck onswitch="{!c.showCardComp}" />
+    </aura:if>
+</aura:component>

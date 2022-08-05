@@ -1,0 +1,113 @@
+<!--Author---- Anjali Sharma
+
+Purpose---- The page that show the standard set controller supported objects and custom objects with its fields 
+to be selected so the records associated with them can be fetched.  
+-->
+
+<apex:page controller="PaginationPageController" sidebar="true">
+    <style>
+        .obj{
+       		 width:170px;
+        }
+        .backgroundSpin{
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            background-color: #000;
+            opacity: 0.2;
+            z-index: 999999;
+        }
+        .spin{
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            background-image: url("/img/loading32.gif");
+            background-size: 30px;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-position: center;
+            z-index: 9999999;
+            opacity: 1;
+        }
+        
+        .text{
+            color:black;
+            font-size:20px;
+        }
+    </style>
+
+    <script>    
+   	 function callComponent(){
+        initiate();
+   	 }
+    </script>
+    <apex:pageMessages />
+    <apex:form id="f1">
+        <apex:actionStatus id="spin">
+            <apex:facet name="start">
+                <div class="backgroundSpin" />
+                <div class="spin" />
+            </apex:facet>
+        </apex:actionStatus>
+        <apex:pageBlock id="renderList" >
+            <apex:pageBlockSection >           
+                <apex:pageBlockSectionItem >
+                    <apex:outputLabel value="Select object:" styleClass="text"></apex:outputLabel>
+                    <apex:selectList value="{!choosenObject}" size="1" styleClass="obj" multiselect="false">
+                        <apex:selectOptions value="{! objectOptions}">
+                        </apex:selectOptions>
+                        <apex:actionSupport action="{!fieldDisplay}" event="onchange" reRender="fields,fieldsToDisplay,component,renderList"  status="spin" />  
+                    </apex:selectList>   
+                </apex:pageBlockSectionItem>
+                <apex:commandButton action="{!resetCall}" value="Reset" />
+            </apex:pageBlockSection>
+        </apex:pageBlock>
+        <apex:outputPanel id="fields">
+            <apex:pageBlock id="fieldsToDisplay" rendered="{!IF(choosenObject !='','true','false')}">
+                <apex:outputPanel >
+                    <table cellspacing="14px">   
+                        <tr>
+                            <td ><div align="top">
+                                	<apex:outputLabel styleClass="text">{!choosenObject}:Fields</apex:outputLabel>
+                                </div>
+                            </td>
+                            <td>
+                            </td>
+                            <td>
+                                <apex:outputLabel styleClass="text" value="Selected Fields" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div>
+                                    <apex:selectList value="{!displayFields}" multiselect="true" size="12" style="width:160px" >
+                                        <apex:selectOptions value="{! fieldOptions}" />
+                                        <apex:actionSupport event="onclick" reRender="fieldsToDisplay" />
+                                    </apex:selectList>
+                                </div>
+                            </td>
+                            <td align="center" style="margin-top:56px"><br/><br/>
+                                <apex:commandButton value="Add" action="{!addSelected}" reRender="fieldsToDisplay" status="spin" disabled="{!if(displayFields.size>0,'false','true')}"/><!-- disabled="{!if((displayFields.size>0),'false','true')}" />--><br />
+                                <apex:commandButton value="Remove" action="{!removeSelected}" reRender="fieldsToDisplay" status="spin" disabled="{!if(addedFields.size>0,'false','true')}"/>
+                               
+                            </td>
+                            <td>
+                                <apex:selectList value="{!addedFields}" multiselect="true" size="12"  id="SelectedFields" style="width:160px">
+                                    <apex:selectOptions value="{! selectedOptions}" />
+                                    <apex:actionSupport event="onclick" reRender="fieldsToDisplay"  />    
+                                </apex:selectList>
+                            </td>
+                        </tr>
+                    </table>
+                </apex:outputPanel>  
+                <apex:commandButton value="Process" action="{!showRec}" reRender="abc" oncomplete="callComponent();" disabled="{!if(selectedOptions.size>0,false,true)}" status="spin" >
+                </apex:commandButton>
+            </apex:pageBlock>
+        </apex:outputPanel>
+           
+      <!--Component Block-->
+        <apex:outputPanel id="component" style="display:{! IF(checkProcess==true,'block','none')}">
+            <c:PaginationVFPageComponent id="records" attr="{!componentObject}" fieldss="{!sOptionsString}" />
+        </apex:outputPanel>
+    </apex:form>
+</apex:page>

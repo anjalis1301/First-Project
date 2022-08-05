@@ -1,0 +1,44 @@
+<template>
+    <div style="background-color:aliceblue;">
+        <div style="height:250px;background-color:rgb(0, 112, 210);">
+            <p style="font-size:50px;color: white; margin-left: 100px;">{parentProductNm}</p>
+        </div>
+        <div class="slds-grid slds-wrap">
+            <div class="slds-col slds-size_6-of-12" style="padding-right:8px;">
+                <div style="height: 250px;background-color: white; margin-top: -150px; margin-left: 100px; width: 380px;">
+                    <p style="text-align: center; padding-top: 100px;">img</p>
+                </div>       
+            </div>
+            
+            <div class="slds-col slds-size_6-of-12" style="padding-right:8px;">
+                <br />
+                <template for:each={displayListPage} for:item="rec" for:index="attributeIndex" >
+                    <p key={rec.attribute} style=" font-size: 20px; font-weight: bold;">{rec.attribute} <br/></p>
+                    <template for:each={rec.attributeValues} for:item="recVal" for:index="valueIndex" >
+                            <lightning-button   key={recVal.value} 
+                                                variant={recVal.valueParam.variant} 
+                                                data-id={button} 
+                                                data-attributeindex={attributeIndex} 
+                                                data-valueindex={valueIndex} 
+                                                data-cinfo={recVal.valueParam.combinationName} 
+                                                data-type={rec.attribute}
+                                                label={recVal.value} 
+                                                disabled={recVal.valueParam.disable}
+                                                onclick={enableDisableData} 
+                                                class="slds-m-left_x-small"
+                            ></lightning-button>
+                    </template>
+                    <p key={rec.attribute}>
+                        <br  /><br  />
+                    </p>                    
+                </template>
+                <div style="font-size: 20px; margin-bottom: 100px;height: 30px;">
+                    <br/>
+                     <p >Number#:{selectedChildProduct}</p> 
+                </div> 
+            </div>
+            
+        </div>
+        
+    </div>
+</template>

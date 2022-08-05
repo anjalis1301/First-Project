@@ -1,0 +1,5 @@
+<aura:component >
+    <aura:attribute name="testMessage" type="String" />
+    <aura:registerEvent name="showMessage" type="c:sampleEvent" />
+    <lightning:button label="Click to fire event" onclick="{!c.fireEvent}" /> 
+</aura:component>

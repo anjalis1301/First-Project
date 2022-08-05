@@ -1,0 +1,42 @@
+<aura:component controller="ServerSidePagination" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+   
+   
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />  
+    <aura:attribute name="AccountRecords" type="Account[]" access = "PRIVATE"/>
+    <aura:attribute name="firstId" type="String" />
+    <aura:attribute name="lastId" type="String" />
+    <aura:attribute name="selectedRecords" type="List" access = "PRIVATE"/>
+    <aura:attribute name="currentPage" type="integer" description="stores page Number" access = "PRIVATE"/> 
+    <aura:attribute name="totalPages" type="integer" description="Display Page Number" access = "PRIVATE"/>
+    <aura:attribute name="totalRecords" type="integer" description="Total Number of Records" access = "PRIVATE"/>
+    <aura:attribute name="sortColumn" type="string" description="Column Name By Which fields should be sorted" default="Name"/>
+    <aura:attribute name="sortDir" type="string" description="Direction of sorting" default="asc" />
+    <aura:attribute name="tableHeaders" type="List" access = "PRIVATE" /> 
+    <div class="slds-box slds-theme_shade slds-theme_alert-texture">
+     <div class="slds-text-align_center slds-text-heading_large">SERVER SIDE PAGINATION</div>
+    <div class="slds-m-around_small" > 
+        <p class="slds-p-horizontal_small slds-box"> 
+            <lightning:datatable aura:id="recordsTable" data="{!v.AccountRecords}" columns="{! v.tableHeaders }"  keyField="Id" sortedBy="{!v.sortColumn}"  sortedDirection="{!v.sortDir}" onsort="{!c.sortThroughHeaders}" onrowselection="{!c.recodSelect}"  /> 
+        </p> <br/><br/>
+        <div class="slds-grid slds-gutters" >
+            <div class="slds-col" style="margin:-20px">
+                Records Per Page: &nbsp;&nbsp;<lightning:select aura:id="recordsPerPage"  onchange="{!c.changeRecordSize}" value="10" class="slds-show_inline-block" > 
+                    <option label="10" value="10"/> 
+                    <option label="15" value="15"/> 
+                    <option  label="20" value="20"/> 
+                </lightning:select>
+            </div>
+            <div class="slds-col">
+                <lightning:button disabled = "{!v.currentPage == 1}" variant = "brand" label="First" onclick = "{!c.navigation}" />
+                <lightning:button disabled="{!v.currentPage == 1}" variant="brand" label="Previous Page" onclick="{! c.navigation }" />             
+                <lightning:button disabled="{!v.currentPage == v.totalPages}" aura:id="previousPage" variant="brand" label="Next Page" onclick="{! c.navigation }" />
+                <lightning:button disabled="{!v.currentPage == v.totalPages}" variant = "brand" label = "Last" onclick="{!c.navigation}" />
+            </div>
+            <div class="slds-col">
+                <p class="slds-float_right">Total Accounts {!v.totalRecords}  <br/> Page {!v.currentPage} / {!v.totalPages}</p> 
+            </div>
+        </div>
+        <lightning:spinner aura:id="spin" alternativeText="Processing......" title="Processing......" variant="brand" size="large" class="slds-hide" /> 
+    </div>
+        </div>
+</aura:component>

@@ -1,0 +1,5 @@
+<aura:component implements="force:appHostable,flexipage:availableForAllPageTypes,force:lightningQuickAction,lightning:isUrlAddressable" access="global" >
+<aura:handler name="init" action="{!c.doInit}" value="{!this}" />
+<aura:attribute name="tabId" type="String" />    
+    <c:filterNav infoTabb ="{!v.tabId}"></c:filterNav>
+</aura:component>

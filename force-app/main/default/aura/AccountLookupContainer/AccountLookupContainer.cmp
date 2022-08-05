@@ -1,0 +1,46 @@
+<aura:component controller="AccountLookup" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,forceCommunity:availableForAllPageTypes,force:lightningQuickAction" access="global" >
+<aura:attribute name="accRec" type="Object" />
+<aura:attribute name="conRec" type="Object" />
+<aura:attribute name="displayCon" type="Boolean" default="true"/>
+<aura:handler action="{!c.doInit}" value="{!this}" name="init" />
+<div style="background-color:white"> 
+<div class="slds-page-header slds-m-bottom--small" role="banner">
+    <div class="slds-media slds-media--center">
+        <div class="slds-media__figure">
+            <span class="slds-icon_container" title="Description of icon when needed">
+                <lightning:icon iconName="standard:contact" variant="brand" size="medium"/>
+            </span>
+        </div>
+        <div class="slds-media__body">
+            <p class="slds-page-header__title slds-truncate slds-text-heading--large">
+                <strong>&nbsp;Contact Information</strong>
+            </p>
+        </div>
+    </div>
+</div>
+
+<aura:if isTrue="{!v.displayCon}" > 
+    <div style="padding:10px;">    
+        <div class="slds-grid slds-wrap">
+            <div class="slds-col slds-size_6-of-12" style="padding-right:8px;">
+                <lightning:input label="LastName" value="{!v.conRec.LastName}"/>&nbsp;&nbsp;
+            </div><div class="slds-col slds-size_6-of-12">
+                <lightning:input label="FirstName" value="{!v.conRec.FirstName}" />
+            </div>        
+            <div class="slds-col slds-size_6-of-12" style="padding-right:8px;">
+                <lightning:input label="Email" value="{!v.conRec.Email}"/>&nbsp;&nbsp;
+            </div>
+            <div class="slds-col slds-size_6-of-12">            
+                <c:CustomLook aura:id="lookUpCmp" userInputs='[{"label":"Accounts","object":"Account","fieldName":"Name","placeholder":"Search Accounts","iconName":"standard:account","recordToDisplay":"5"}]' selectedRecordId='{!v.accRec.Id}' selectedPill="{!v.accRec.Name}"/>            
+            </div>
+        </div>
+        <center><lightning:button class="slds-m-top_small" variant="brand" name="Update" label="Update" onclick="{!c.updateRecord}"/></center>
+        <lightning:spinner class="slds-hide" aura:id="Spinner" alternativeText="Loading" size="medium" variant="brand"/>
+    </div>
+    
+<aura:set attribute="else" >
+    <center><div><h1>No Related Contacts</h1></div><br/></center>
+</aura:set>
+</aura:if>
+</div>
+</aura:component>

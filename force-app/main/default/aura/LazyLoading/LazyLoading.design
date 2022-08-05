@@ -1,0 +1,4 @@
+<design:component>
+    <design:attribute name="objName" label = "Object Name" />
+    <design:attribute name="fields" label ="Fields To Display" />
+</design:component>

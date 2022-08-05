@@ -1,0 +1,111 @@
+<aura:component controller="KanbanView" implements="force:appHostable">
+    <aura:attribute name="objectMap" type="Map"  />
+    <aura:attribute name="objectList" type="List" />
+    <aura:attribute name="pickListNames" type="List" />
+    <aura:attribute name="fieldOptions" type="List"/>
+    <aura:attribute name="kanbanHeaders" type="List" />
+    <aura:attribute name="showPickList" type="Boolean" />
+    <aura:attribute name="selectedFields" type="String" default="Name,StageName"/>
+    <aura:attribute name="selectedObject" type="String" default="Opportunity"/>
+    <aura:attribute name="sObjectRecords" type="List" />
+    <aura:attribute name="headerList" type="List" />
+    <aura:attribute name="displayKanban" type="Boolean" />
+    <aura:attribute name="selectedPickList" type="String" default="StageName"/>
+    <aura:attribute name="processBtn" type="Boolean"  default="true" />
+    <aura:attribute name="displaydualList"  type="Boolean" default="false" />
+    <aura:attribute name="showFields" type="boolean" default="false" />
+    <aura:attribute name="reqOptions" type="List" />
+    <aura:attribute name="selectPickListValues" type="List" />
+    <aura:handler name="init" value="{!this}" action="{!c.doInit}" />
+    <div class="slds-page-header slds-m-bottom--small" role="banner">
+        <div class="slds-media slds-media--center">
+            <div class="slds-media__figure">
+                <span class="slds-icon_container" title="Description of icon when needed">
+                    <lightning:icon iconName="utility:kanban" variant="brand" size="medium"/>
+                </span>
+            </div>
+            <div class="slds-media__body">
+                <p class="slds-page-header__title slds-truncate slds-text-heading--large">
+                    <strong>&nbsp;Kanban View </strong>
+                </p>
+            </div>
+        </div>
+    </div>
+    
+    <div style="background-color:white; padding-left: 28px; padding-bottom:15px;">
+        <div class="slds-size_2-of-5" >
+            <lightning:select name="Object" label="Select An Object" onchange="{!c.getFieldAndPickList}" 
+                              class="slds-show_inline-block">
+                <option value="" text="None" disabled="true" />        
+                <aura:iteration items="{!v.objectList}" var="obj" >
+                    <option value="{!obj}" >{!obj}</option>
+                </aura:iteration>
+            </lightning:select><br/><br/>
+            <aura:if isTrue="{!v.showPickList}" >
+                <lightning:combobox aura:id="pickSelect" name="pckLst" label="Select a pickList"
+                                    onchange="{!c.getPickList}"  
+                                    placeholder="None" options="{!v.pickListNames}" />
+            </aura:if>
+            <aura:if isTrue="{!v.showFields}">
+                 <div class="slds-p-right_medium slds-p-vertical_xxx-small" >            
+                    <lightning:dualListbox  class="slds-align_absolute-center" 
+                                       disableReordering="true" name="fields" 
+                                       label="Select fields" min="2" max="4"  
+                                       value="{!v.selectPickListValues}" 
+                                       fieldLevelHelp="Select min 2 and max. 4 fields to display" 
+                                       options="{!v.fieldOptions}"  requiredOptions="{!v.reqOptions}" 
+                                       onchange="{!c.selectedFieldNames}" />
+                </div>
+                <br /><lightning:button variant="brand" disabled="{!v.processBtn}"  label="Process" onclick="{!c.showKanban}" /><br /><br /><br/>
+            </aura:if>
+        </div>
+    </div>
+    <aura:if isTrue="{!v.displayKanban}" >
+        <div class="stageContainer" style="overflow-y:auto;overflow-x:auto;background-color:white;">
+            <div class="slds-grid">
+                <div class="slds-tabs--path" role="application" >
+                    <ul class="slds-tabs--path__nav" role="tablist" style="padding-left:12px">
+                        <aura:iteration items="{!v.headerList}" var="status">
+                            <li class="slds-tabs--path__item slds-is-active" style="min-width:365px !important;max-width:365px !important;">
+                                <a class="slds-tabs--path__link" tabindex="-1" role="tab" href="">
+                                    <span class="slds-tabs--path__title slds-text-heading--medium slds-truncate">{!status.header} &nbsp;</span>
+                                    <span class="slds-text-heading--medium">({!status.count})</span>
+                                </a>
+                            </li>               
+                        </aura:iteration>
+                    </ul>
+                </div>
+            </div>
+            <div>          
+                <div class="slds-border_bottom slds-p-around_x-small">
+                    <ul  class="slds-list_horizontal  ">
+                        <aura:iteration items="{!v.kanbanHeaders}" var = "header">
+                            <li class="slds-item slds-m-around_small"  style="min-width:365px !important;max-width:365px !important;margin:-0.005rem !important;">
+                                <ul  class="slds-has-dividers_around-space dropZone" ondrop="{!c.dropData}" ondragover="{!c.allowDrop}" data-Pick-Val="{!header}" style="height:70vh;overflow-y:auto;">
+                                    <aura:iteration items="{!v.sObjectRecords}" var="rec" >
+                                        <aura:if isTrue="{!header == rec.label1}">
+                                            <li class="slds-item slds-m-around_small" draggable="true" ondragstart="{!c.dragStart}" id="{!rec.Id}">
+                                                <article class="slds-tile slds-tile_board">
+                                                    <h3 class="slds-tile__title slds-truncate" title="{!rec.label0}">
+                                                        <a href="" onclick="{!c.editRecord}">
+                                                            <span class="slds-truncate" id="{!rec.Id}">{!rec.label0}</span>
+                                                        </a>
+                                                    </h3>
+                                                    <div class="slds-tile__detail slds-text-body_small">
+                                                        <p class="slds-truncate" title="{!rec.label1}">{!rec.label1}</p>
+                                                        <p class="slds-truncate" title="{!rec.label2}">{!rec.label2}</p>
+                                                        <p class="slds-truncate" title="{!rec.label3}">{!rec.label3}</p>
+                                                    </div>
+                                                </article>
+                                            </li>
+                                        </aura:if>
+                                    </aura:iteration>
+                                </ul><br /><br /><br /><br /><br />
+                            </li>
+                        </aura:iteration>
+                    </ul>
+                </div> 
+            </div>
+        </div>
+    </aura:if>
+</aura:component>

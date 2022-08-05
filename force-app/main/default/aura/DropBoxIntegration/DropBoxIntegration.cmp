@@ -1,0 +1,91 @@
+<aura:component controller = "DropBoxIntegrate" implements="forceCommunity:availableForAllPageTypes" access="global" >
+	 
+    <aura:handler name = "init" value = "{!this}" action = "{!c.doInit}" />
+    <!--aura:attribute name = "URL" type = "String" /-->
+    <aura:attribute name = "FileAndFolder" type = "List" />
+    <!--aura:attribute name = "fileType" type = "String" /-->
+    <aura:attribute name = "accesstoken" type = "String" />
+    <aura:attribute name = "parentId" type = "String" default = "0" />
+    <aura:attribute name = "fileName" type = "String" />
+    <aura:attribute name = "newFolderName" type = "String" default = "" />
+    <aura:attribute name = "breadcrumbCollection" type = "List" />
+     <lightning:spinner aura:id="spinner1" alternativeText="Processing.." size="large" class="slds-hide" />
+    <lightning:breadcrumbs>
+        <aura:iteration items="{! v.breadcrumbCollection }" var="breadcrumb" indexVar = "index" >
+            <lightning:breadcrumb label="{!breadcrumb.name}" onclick="{! c.handlebreadcrums }" name = "{!index}" />
+        </aura:iteration>
+    </lightning:breadcrumbs>
+    
+    <div class="slds-scrollable_y" style="height:28rem;width:86rem">
+        <table class="slds-table slds-table_cell-buffer slds-table_bordered">
+            <thead>
+                <tr class="slds-line-height_reset">
+                    <th class="" scope="col">
+                        <div class="slds-truncate" title="FileFolder">FileFolder</div>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <aura:iteration items="{!v.FileAndFolder}" var="FileFolder" indexVar="index">
+                    <tr class="slds-hint-parent">
+                        <td>
+                            <aura:if isTrue="{!FileFolder.temp}">
+                                <div>
+                                    <lightning:icon iconName="utility:open_folder" alternativeText="open_folder!" variant="open_folder"/>
+                                </div> 
+                                <aura:set attribute="else">
+                                    <div>
+                                        <lightning:icon iconName="utility:file" alternativeText="file!" variant="file"/>
+                                    </div>
+                                </aura:set>
+                            </aura:if>
+                        </td>
+                        <td data-label="FileFolder">
+                            <div class="slds-truncate" >
+                                <a onclick="{!c.openF}"  data-fileData="{!FileFolder}" data-index="{! index }" >{!FileFolder.name}</a>   
+                            </div>
+                        </td>
+                        <td>
+                            <aura:if isTrue="{!!FileFolder.temp}">
+                                <div>
+                                    <a onclick="{!c.download}"  data-fileData="{!FileFolder}" data-index="{!index}">
+                                        <lightning:icon iconName="utility:download" alternativeText="download!" variant="download"/>
+                                    </a>
+                                </div> 
+                                <aura:set attribute="else">
+                                    <div>
+                                    </div>
+                                </aura:set>
+                            </aura:if>
+                        </td>
+                        <td>
+                            <div>
+                                <a onclick="{!c.deleteF}"  data-fileData="{!FileFolder}" data-index="{! index }">
+                                    <lightning:icon iconName="utility:delete" alternativeText="delete!" variant="delete"/>
+                                </a>
+                            </div>
+                        </td> 
+                        
+                    </tr>
+                </aura:iteration>
+            </tbody>
+        </table>
+    </div>
+    <table>
+        <tr>
+            <td>
+                <div> 
+                    <lightning:input aura:id="fileId" onchange="{!c.handleFilesChange}" type="file" name="file" label="Upload Attachment" multiple="false"/>
+                    <div class="slds-text-body_small slds-text-color_error">{!v.fileName} </div>
+                    <button class="slds-button slds-button_brand" onclick="{!c.doSave}">Upload Attachment</button>
+                </div>
+            </td>
+            <td>
+                <div class="cssOnCreateFolder">
+                    <lightning:input style="margin-top: 6%" name="input1" label="Enter some text" value ="{!v.newFolderName}" onclick="{c.clearText}"/>
+                    <button class="slds-button slds-button_brand" onclick="{!c.createFolder}">CreateFolder</button>
+                </div>
+            </td>
+        </tr>
+    </table>
+</aura:component>

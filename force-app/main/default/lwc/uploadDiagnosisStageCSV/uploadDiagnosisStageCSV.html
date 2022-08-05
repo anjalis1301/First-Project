@@ -1,0 +1,90 @@
+<template>
+  <div class="slds-card" >
+    <div class="slds-grid_vertical slds-align_absolute-center">
+      <div class="slds-col">
+        <div  class="slds-m-around--x-large">
+          <p style="color:#451c77;" class="slds-text-heading_large"><lightning-formatted-text value="Choose the object in which you want to upload the CSV !!"></lightning-formatted-text></p>
+        </div>  
+        <div>
+          <lightning-combobox
+            name="Objects"
+            label="Objects"
+            value={selectedObjectValue}
+            placeholder="Select Progress"
+            options={options}
+            onchange={storeChoice} ></lightning-combobox>
+        </div>  
+      </div>
+    </div>
+    <template if:true={selectedLabel}>
+      <div class="slds-grid_vertical slds-align_absolute-center">      
+        <div class="slds-col">
+          <div  class="slds-m-around--x-large">
+            <p style="color:#451c77;" class="slds-text-heading_medium"><lightning-formatted-rich-text value={selectedLabel}></lightning-formatted-rich-text></p>
+          </div>    
+        </div>
+        <div class="slds-col">
+          <lightning-file-upload label="Attach Staging CSV"
+            name="fileUploader"
+            accept="['.csv']"
+            onuploadfinished={handleUploadFinished}>
+            </lightning-file-upload><br />
+            <div >
+              <span>Note:</span>
+              <ul class="slds-list_dotted">              
+                <li class="">Effective Date field should be in 'YYYY-MM-DD' format.</li>
+              </ul>
+            </div>
+            
+        </div>
+      </div>
+    </template>
+    <div>
+      <br /><br />
+      <template if:true={recordsResult.summaryDisplay}>
+        <div class="slds-grid_vertical slds-align_absolute-center">
+          <div class="slds-col">
+            <span class="slds-text-heading_large">Result Summary</span>
+          </div><br/>
+          <div class="slds-col">            
+            <span class="slds-text-heading_medium">Total Records : </span><span class="slds-text-heading_medium" >{recordsResult.total}</span>
+          </div>
+          <div  class="slds-text-align--left">
+            <span class="slds-text-heading_medium slds-text-color_error">Failed Records : </span><span class="slds-text-heading_medium slds-text-color_error">{recordsResult.failed}</span>
+          </div>
+          <div class="slds-col" >
+            <span class="slds-text-heading_medium slds-text-color_success">Inserted Records : </span><span class="slds-text-heading_medium slds-text-color_success">{recordsResult.inserted}</span>
+          </div>
+        </div>
+        <template if:true={recordsResult.errorDetails}>
+          <br />
+          <div class="slds-grid_vertical">
+            <p class="slds-col slds-text-heading_medium slds-action-overflow_touch__footer" style="color:red;">Error Details</p>
+            <ol class="slds-list_ordered">                        
+                <template for:each={recordsResult.errorDetails} for:item="rec" for:index="index">                  
+                    <li key={rec} style="color:orange;font-size: 0.86rem;" class="slds-border_bottom slds-m-around--medium"><lightning-formatted-rich-text value={rec}></lightning-formatted-rich-text></li>                 
+                </template>              
+              </ol><br/><br/>
+          </div>          
+        </template>
+      </template>
+    </div>
+    <template if:true={enableExecute}><br /><br/>
+      <div class="slds-grid_vertical slds-align_absolute-center">
+        <div class="slds-col">
+          <span class="slds-text-heading_medium">To process and upsert staging records </span>
+        </div><br/>
+        <div class="slds-col">
+          <lightning-button variant="brand" label="Execute" title="Process Records" onclick={executeClicked} class="slds-m-left_x-small"></lightning-button>
+        </div>
+      </div>
+    </template>
+    <template if:true={showMessage}><br /><br/>
+      <div class="slds-grid_vertical slds-align_absolute-center">
+        <div class="slds-col">
+          <p style="color:#451c77;" class="slds-text-heading_medium">{message}</p>
+        </div>
+      </div>      
+    </template>
+  </div>  
+</template>
